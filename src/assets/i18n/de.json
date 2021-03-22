@@ -1,0 +1,39 @@
+{
+  "HEADER": {
+    "TODAY": "Heute",
+    "VIEWS": {
+      "YEAR": "Jahr",
+      "MONTH": "Monat",
+      "WEEK": "Woche",
+      "DAY": "Tag"
+    }
+  },
+  "WEEK": {
+    "DAYS": {
+      "MON": "Mo",
+      "TUE": "Di",
+      "WED": "Mi",
+      "THU": "Do",
+      "FRI": "Fr",
+      "SAT": "Sa",
+      "SUN": "So"
+    }
+  },
+  "EVENTS": {
+    "ALL_DAY": "Ganztägig"
+  },
+  "MONTHS": {
+    "JAN":"Januar",
+    "FEB":"Februar",
+    "MAR":"März",
+    "APR":"April",
+    "MAY":"Mai",
+    "JUN":"Juni",
+    "JUL":"Juli",
+    "AUG":"August",
+    "SEP":"September",
+    "OCT":"Oktober",
+    "NOV":"November",
+    "DEC":"Dezember"
+  }
+}
