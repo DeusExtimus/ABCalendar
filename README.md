@@ -2,7 +2,7 @@
 
 **I'm just a apprentice in Software Development and this is my first dependency. Sometimes it doesn't work but I update continiusly**
 <br/>
-If you need it right now, download repo from git and copy code ;)
+FUNCTIONAL SINCE 1.0.35
 
 # ABCalendar
 
@@ -127,6 +127,3 @@ This is an example for the WeekView with some Events:
 
 This is an example for the DayView with some Events:
 ![year view](./src/assets/expampleImages/dayview.jpg)
-"ABCalendar" 
-"# ABCalendar" 
-"# ABCalendar" 

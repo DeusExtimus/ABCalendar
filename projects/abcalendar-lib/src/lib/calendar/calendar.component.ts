@@ -36,6 +36,21 @@ export class CalendarComponent implements OnInit {
 
   itemCounter: number;
 
+  defLocales = {
+    localeEn: {
+      weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      others: ['Year', 'Week', 'Month', 'Day', 'Today', 'All Day'],
+      lang: null
+    },
+    localeDe: {
+      weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+      months: ['Januar', 'Februar', 'Mrz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'OKtober', 'November', 'Dezember'],
+      others: ['Jahr', 'Woche', 'Monat', 'Tag', 'Heute', 'Ganztägig'],
+      lang: null
+    }
+  };
+
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
     // day
@@ -58,6 +73,27 @@ export class CalendarComponent implements OnInit {
     this.setInitialDate();
     this.checkEvents();
     this.prepareButtons();
+    this.setLocaleForCalendar();
+  }
+
+  getMonthsForLocale(locale): string[] {
+    const format = new Intl.DateTimeFormat(locale, {month: 'long'});
+    const months = [];
+    for (let month = 0; month < 12; month++) {
+      const dateToFormat = new Date(Date.UTC(2000, month, 1, 0, 0, 0));
+      months.push(format.format(dateToFormat));
+    }
+    return months;
+  }
+
+  getWeekdaysForLocale(locale): string[] {
+    const format = new Intl.DateTimeFormat(locale, {weekday: 'long'});
+    const weekdays = [];
+    for (let weekday = 0; weekday < 6; weekday++) {
+      const dateToFormat = new Date(Date.UTC(2000, weekday, 1, 0, 0, 0));
+      weekdays.push(format.format(dateToFormat));
+    }
+    return weekdays;
   }
 
   numSequence(n: number): Array<number> {
@@ -247,7 +283,7 @@ export class CalendarComponent implements OnInit {
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
     let a;
     if (rightMonth == null) {
-      a = Date.UTC(this.year, this.month, dayNumber + 1);
+      a = Date.UTC(this.year, new Date(Date.now()).getMonth(), dayNumber + 1);
     } else {
       a = Date.UTC(this.year, rightMonth, dayNumber + 1);
     }
@@ -326,7 +362,7 @@ export class CalendarComponent implements OnInit {
       this.mBtn = true;
       this.wBtn = true;
       this.dBtn = true;
-      this.dBtn = true;
+      this.yBtn = true;
     } else {
       for (const btn of this.views) {
         switch (btn) {
@@ -350,10 +386,19 @@ export class CalendarComponent implements OnInit {
       }
     }
   }
+
+  private setLocaleForCalendar(): void {
+    if (this.localeValue == null) {
+      this.localeValue = this.defLocales.localeEn;
+    } else if (this.localeValue.lang === 'en-En' || this.localeValue.lang === 'en-US') {
+      this.localeValue = this.defLocales.localeEn;
+    } else if ('de-De') {
+      this.localeValue = this.defLocales.localeDe;
+    }
+  }
 }
 
 export class Item {
-
   itemId?: number;
   list?: List;
   title: string;
@@ -362,7 +407,6 @@ export class Item {
 }
 
 export class List {
-
   listId?: number;
   item?: Item[];
   title?: string | undefined;
@@ -370,8 +414,8 @@ export class List {
 }
 
 export class Local {
-  weekdays ? = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  months ? = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  others ? = ['Year', 'Week', 'Month', 'Day', 'Today', 'All Day'];
+  weekdays ?: string[];
+  months ?: string[];
+  others ?: string[];
+  lang ?: string;
 }
-

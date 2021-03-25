@@ -15,8 +15,24 @@ export declare class CalendarComponent implements OnInit {
     wBtn: boolean;
     dBtn: boolean;
     itemCounter: number;
+    defLocales: {
+        localeEn: {
+            weekdays: string[];
+            months: string[];
+            others: string[];
+            lang: any;
+        };
+        localeDe: {
+            weekdays: string[];
+            months: string[];
+            others: string[];
+            lang: any;
+        };
+    };
     private static setMonthAndDayFormat;
     ngOnInit(): void;
+    getMonthsForLocale(locale: any): string[];
+    getWeekdaysForLocale(locale: any): string[];
     numSequence(n: number): Array<number>;
     getDaysOfMonth(f?: number): number;
     getEmptyStartDays(f?: number): number;
@@ -39,6 +55,7 @@ export declare class CalendarComponent implements OnInit {
     private checkEvents;
     private getWholeWeek;
     private prepareButtons;
+    private setLocaleForCalendar;
 }
 export declare class Item {
     itemId?: number;
@@ -57,4 +74,5 @@ export declare class Local {
     weekdays?: string[];
     months?: string[];
     others?: string[];
+    lang?: string;
 }
