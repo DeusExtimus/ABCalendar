@@ -127,3 +127,4 @@ This is an example for the WeekView with some Events:
 
 This is an example for the DayView with some Events:
 ![year view](./src/assets/expampleImages/dayview.jpg)
+"ABCalendar" 
