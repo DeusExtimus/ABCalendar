@@ -1,0 +1,190 @@
+<div class="container-fluid">
+  <div class="ml-5 mr-5 text-center">
+    <!--  HEADER-->
+    <div class="row mt-5">
+      <div class="col-4">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-dark" (click)="prev()"> &#60;</button>
+          <button type="button" class="btn btn-outline-dark"
+                  (click)="currentDay()">{{localeValue.others[4]}}</button>
+          <button type="button" class="btn btn-outline-dark" (click)="next()">&#62;</button>
+        </div>
+      </div>
+      <div class="col-4 text-center"><h1>{{setTitle()}}</h1></div>
+      <div class="col-4">
+        <div class="btn-group text-right" role="group">
+          <button type="button" class="btn btn-outline-dark" *ngIf="yBtn"
+                  (click)="initialView = 'year'; itemCounter = 0">{{localeValue.others[0]}}</button>
+          <button type="button" class="btn btn-outline-dark" *ngIf="mBtn"
+                  (click)="initialView = 'month'; itemCounter = 0">{{localeValue.others[2]}}</button>
+          <button type="button" class="btn btn-outline-dark" *ngIf="wBtn"
+                  (click)="initialView = 'week'; itemCounter = 0">{{localeValue.others[1]}}</button>
+          <button type="button" class="btn btn-outline-dark" *ngIf="dBtn"
+                  (click)="initialView = 'day'; itemCounter = 0">{{localeValue.others[3]}}</button>
+        </div>
+      </div>
+    </div>
+
+    <!--JAHRESANSICHT-->
+    <div class="row" *ngIf="initialView =='year'">
+      <div *ngFor="let column of numSequence(12); let f = index;" class="col-lg-4 mt-3">
+        <div class="border">
+          <div class="col-12 justify-content-center">
+            <!--            Monthnames-->
+            <div class="container-fluid text-center">
+              <h5 style="font-weight: bolder">{{localeValue.months[f]}}</h5>
+            </div>
+            <div class="row">
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
+              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
+
+              <div *ngFor="let beforeDay of numSequence(getEmptyStartDays(f)); let ac = index;"
+                   class="border w-14 h-117px">
+              </div>
+              <div *ngFor="let currentDay of numSequence(getDaysOfMonth(f)); let dayNumber = index;"
+                   class="border text-left w-14 h-117px"
+                   [ngStyle]="{'background-color': colorOfTheDay(dayNumber, f)}">
+                <div class="ml-2">
+                  {{dayNumber + 1}}
+                  {{resetCounter()}}
+                </div>
+                <div *ngFor="let item of events">
+                  <div *ngIf="itemCounter < 3">
+                    <div *ngIf="correctDate(item, dayNumber, f)" class="border border-dark rounded m-1"
+                         [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                      <div class="ml-1 crop pointer" (click)="eventClick.emit(item)">
+                        {{item.title}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngFor="let afterDay of numSequence(getEmptyEndDays(f)); let daysOfNextMonth = index;"
+                   class="border w-14 h-117px"
+                   style="color: lightgray">
+                {{daysOfNextMonth + 1}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--MONATSANSICHT-->
+    <div *ngIf="initialView == 'month'">
+      <div class="row">
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
+        <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
+             class="border w-14 h-117px">
+        </div>
+        <div *ngFor="let currentday of numSequence(getDaysOfMonth()); let dayNumber = index"
+             class="border text-left w-14 h-117px" [ngStyle]="{'background-color': colorOfTheDay(dayNumber)}">
+          <div class="ml-2">
+            {{dayNumber + 1}}
+            {{resetCounter()}}
+          </div>
+          <div *ngFor="let item of events">
+            <div *ngIf="itemCounter < 3">
+              <div *ngIf="correctDate(item, dayNumber)">
+                <div class="ml-1 border border-dark rounded m-1 crop pointer" (click)="eventClick.emit(item)"
+                     [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                  {{item.title}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngFor="let afterday of numSequence(getEmptyEndDays()); let daysOfNextMonth = index;"
+             class="border text-left w-14 h-117px lg">
+          <div class="ml-2">
+            {{daysOfNextMonth + 1}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--WOCHENANSICHT-->
+    <div *ngIf="initialView == 'week'">
+      <div class="justify-content-center">
+        <div class="border border-light">
+          <div class="row">
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
+          </div>
+        </div>
+        <div class="row">
+          <div *ngFor="let counter of numSequence(7); let days = index" class="w-14 border border-grey week-height"
+               [ngStyle]="{'background-color': colorOfTheDay(getDatesOfWeek(days))}">
+            <div *ngFor="let item of events">
+              <div *ngIf="correctDate(item, getDatesOfWeek(days))" class="m-1">
+                <div class="rounded w-100 border border-dark crop pointer" (click)="eventClick.emit(item)"
+                     [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                  {{item.title}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--TAGESANSICHT-->
+    <div *ngIf="initialView == 'day'">
+      <div class="row justify-content-center">
+        <div class="w-100">
+          <div class="row">
+            <div class="border border-grey w-14 bg-dark min-height">
+              <div class="lg">
+                {{localeValue.others[5]}}
+              </div>
+            </div>
+            <div class="w-85">
+              <div *ngFor="let item of events">
+                <div *ngIf="isAllDayItem(item) && correctDate(item, day - 1)">
+                  <div class="border border-grey h-50 justify-content-center">
+                    <div class="rounded w-100 border border-dark crop pointer" (click)="eventClick.emit(item)"
+                         [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                      {{item.title}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="h-2px"></div>
+          <div *ngFor="let counter of numSequence(24); let hours = index; ">
+            <div class="row">
+              <div class="border border-grey w-14 bg-dark h-50px">
+                <div class="lg">
+                  {{getHoursOfDay(hours)}}
+                </div>
+              </div>
+              <div class="w-85">
+                <div class="border border-grey h-50"></div>
+                <div class="border border-grey h-50"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="container h-50px"></div>
+</div>

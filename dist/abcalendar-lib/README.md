@@ -1,9 +1,3 @@
-# IMPORTANT!!!
-
-**I'm just a apprentice in Software Development and this is my first dependency. Sometimes it doesn't work but I update continiusly**
-<br/>
-If you need it right now, download repo from git and copy code ;)
-
 # ABCalendar
 
 **CURRENTLY ONLY ALL DAY & SINGLE DAY EVENTS SUPPORTED**

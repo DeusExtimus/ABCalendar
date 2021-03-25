@@ -1,0 +1,19 @@
+{
+  "name": "abcalendar",
+  "version": "1.0.34",
+  "peerDependencies": {
+    "@angular/common": "^10.0.14",
+    "@angular/core": "^10.0.14"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
+  "main": "bundles/abcalendar.umd.js",
+  "module": "fesm2015/abcalendar.js",
+  "es2015": "fesm2015/abcalendar.js",
+  "esm2015": "esm2015/abcalendar.js",
+  "fesm2015": "fesm2015/abcalendar.js",
+  "typings": "abcalendar.d.ts",
+  "metadata": "abcalendar.metadata.json",
+  "sideEffects": false
+}

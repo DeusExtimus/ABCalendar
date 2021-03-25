@@ -1,0 +1,49 @@
+.w-14{
+  width: 14.2857%;
+}
+
+.w-85{
+  width: 85.7143%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.h-2px{
+  height: 2px;
+}
+
+.h-50px{
+  height: 50px;
+}
+
+.h-100px{
+  height: 100px;
+}
+
+.h-117px{
+  height: 119px;
+}
+
+.lg{
+  color: lightgrey;
+}
+
+.min-height{
+  min-height: 50px;
+}
+
+.week-height{
+  height: 300px;
+}
+
+.border-grey{
+  border-color: #8f8f8f;
+}
+
+.crop {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
