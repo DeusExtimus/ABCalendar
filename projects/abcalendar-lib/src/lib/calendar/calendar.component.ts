@@ -289,7 +289,7 @@ export class CalendarComponent implements OnInit {
     }
     const b = Date.UTC(this.year, this.month, this.today.getDate());
     if (a === b) {
-      return '#ececf5';
+      return '#d0d0f5';
     }
   }
 

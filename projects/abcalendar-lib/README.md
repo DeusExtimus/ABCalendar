@@ -214,13 +214,13 @@ export class List {
 
 ## Pictures
 This is an example for the YearView with some Events:
-![year view](./src/assets/exampleImages/yearView.jpg)
+![year view](../../assets/exampleImages/yearView.jpg)
 
 This is an example for the MonthView with some Events:
-![month view](./src/assets/exampleImages/monthView.jpg)
+![month view](../../assets/exampleImages/monthView.jpg)
 
 This is an example for the WeekView with some Events:
-![week view](./src/assets/exampleImages/weekView.jpg)
+![week view](../../assets/exampleImages/weekView.jpg)
 
 This is an example for the DayView with some Events:
-![day view](./src/assets/exampleImages/dayView.jpg)
+![day view](../../assets/exampleImages/dayView.jpg)

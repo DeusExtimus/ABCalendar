@@ -1,12 +1,5 @@
 # ABCalendar
 
-## Important
-**I'm just a apprentice in Software Development and this is my first dependency. Sometimes it doesn't work but I update continiusly
-<br/>
-WORKS SINCE 1.0.34
-<br/>
-UPDATES INCOMING**
-
 ## Note & Description
 **CURRENTLY ONLY ALL DAY & SINGLE DAY EVENTS SUPPORTED**
 
@@ -221,13 +214,13 @@ export class List {
 
 ## Pictures
 This is an example for the YearView with some Events:
-![year view](assets/exampleImages/yearView.jpg)
+![year view](../../assets/exampleImages/yearView.jpg)
 
 This is an example for the MonthView with some Events:
-![month view](assets/exampleImages/monthView.jpg)
+![month view](../../assets/exampleImages/monthView.jpg)
 
 This is an example for the WeekView with some Events:
-![week view](assets/exampleImages/weekView.jpg)
+![week view](../../assets/exampleImages/weekView.jpg)
 
 This is an example for the DayView with some Events:
-![day view](assets/exampleImages/dayView.jpg)
+![day view](../../assets/exampleImages/dayView.jpg)
