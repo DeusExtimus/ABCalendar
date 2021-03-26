@@ -19,7 +19,7 @@ Configurable values:
 - Add routing if you want and choose scss as Style 
 
 ##### 2. Install Bootstrap
-- **Bootstrap:** 
+- **Bootstrap:**
    * If you use Bootstrap 4.6.0 or lower, you maybe need to install jQuery, too
    * Run *npm i bootstrap* in your terminal
    * Add the following to your **angular.json**-file:

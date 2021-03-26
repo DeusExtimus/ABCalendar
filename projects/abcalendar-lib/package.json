@@ -1,6 +1,6 @@
 {
   "name": "abcalendar",
-  "version": "1.0.38",
+  "version": "1.0.39",
   "peerDependencies": {
     "@angular/common": "^10.0.14",
     "@angular/core": "^10.0.14",
@@ -8,5 +8,25 @@
   },
   "dependencies": {
     "tslib": "^2.0.0"
-  }
+  },
+  "description": "**CURRENTLY ONLY ALL DAY & SINGLE DAY EVENTS SUPPORTED**",
+  "main": "karma.conf.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeusExtimus/ABCalendar.git"
+  },
+  "author": "deusextimus",
+  "keywords": [
+    "scss",
+    "bootstrap",
+    "angular",
+    "calendar",
+    "yearView Calendar",
+    "EasyToUse"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeusExtimus/ABCalendar/issues"
+  },
+  "homepage": "https://github.com/DeusExtimus/ABCalendar#readme"
 }
