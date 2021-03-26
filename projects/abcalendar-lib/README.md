@@ -1,5 +1,6 @@
 # ABCalendar
 
+## Note & Description
 **CURRENTLY ONLY ALL DAY & SINGLE DAY EVENTS SUPPORTED**
 
 The ABCalender was programmed, because there is still no usable calendar with year view, which is easy to use and therefore ideal for beginners.
@@ -11,14 +12,140 @@ Configurable values:
 - Event input
 - Event output (on Click)
 
-## Implementation
-* run "npm i abcalendar" in Terminal
-* go to html and write **<lib-abcalendar-lib></lib-abcalendar-lib>**
-* setup calendar like in [the example](#example)
+## Setup a program with ABCalendar
 
+##### 1. Generate Program
+- Write in *cmd*: ng new *program-name*
+- Add routing if you want and choose scss as Style 
 
+##### 2. Install Bootstrap
+- **Bootstrap:** 
+   * If you use Bootstrap 4.6.0 or lower, you maybe need to install jQuery, too
+   * Run *npm i bootstrap* in your terminal
+   * Add the following to your **angular.json**-file:
+    ```
+    "styles": [
+               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+               "src/styles.scss"
+              ],
+    "scripts": [
+               "node_modules/bootstrap/dist/js/bootstrap.js"
+               ]
+    ```
+  <span style="color: RED">**WARNING:** YOU NEED TO ADD THIS CODE TWICE IN THE ANGULAR.JSON-FILE<span/> 
+  
+##### 3. Install ABCalendar
+- Run *npm i abcalendar* in your terminal
+- Add AbcalendarLibModule to your app.module.ts
+    * example:
+        ```
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      
+      import { AppRoutingModule } from './app-routing.module';
+      import { AppComponent } from './app.component';
+      import {AbcalendarLibModule} from 'abcalendar';
+      
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+          imports: [
+              BrowserModule,
+              AppRoutingModule,
+              AbcalendarLibModule
+          ],
+        providers: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+        ```
+      
+##### 4. Setup ABCalendar
+- Smallest required text in component.html:
+    ```
+  <lib-abcalendar-lib>
+  </lib-abcalendar-lib>
+    ```
+- config examples for Input-Values:
+    * config for [views]:
+        * in .html:
+        ```
+      [views] = "['year','month','week','day']"
+        ```
+    * config for [initialView]:
+        * in .html:
+      ```
+      [initialView]="'month'"
+      ```
+    * config for [initialDate]:
+        * in .html:
+        ```
+        [initialDate] = "setInitialDate()"
+        ```
+        * in .ts:
+        ```
+        setInitialDate(): Date {
+            return new Date(Date.now());
+        }
+        ```
+    * config for [localeValue]:
+        * in .html:
+        ```
+        [localeValue] = "setLocaleValue()"
+        ```
+        * in .ts:
+        ```
+        import {Local} from 'abcalendar';
+        .
+        .
+        .
+        setLocaleValue(): Local {
+            return {
+                  weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                  months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                  others: ['Year', 'Week', 'Month', 'Day', 'Today', 'All Day']
+                   };
+        }
+        ```
+    * config for [events]:
+        * in .html:
+        ```
+        [events] = "getEvents()"
+        ```
+        
+        * in .ts with own Input:
+        ```
+        import {Item} from 'abcalendar';
+        .
+        .
+        .
+        getEvents(): Item {
+        const date = new Date(Date.now());
+        return [{itemId: 1, title: 'aTitle', dateOfExpiry: date, color: '#000'}];
+        }
+        ```
+        * in .ts with language Input:
+        ```
+        return {lang: 'en-US'};
+        ```
+        -> string must be in locale-Format (example: en-US, de-De)
+        
+    * usage of (eventEmitter):
+        * in .html:
+        ```
+        (eventEmitter) = "setItem($event)"
+        ```
+        * in .ts:
+        ```
+        setItem($event): void {
+            console.log($event.title);
+            console.log($event.itemId);
+            this.router.navigateByUrl(`randomPageUrl/${$event.itemId}`);
+        }
+        ```
+        
 ## Input types
-
 [views]: 
 * string[]
 * Choice:   'year','month','week','day'
@@ -42,10 +169,9 @@ Configurable values:
 * Item[]: (id, title, color, list, dateOfExpiry)
 * Optional: list, color
 
-
 ## Output Types
 
-(eventClick):
+(eventEmitter):
 * Item
 
 ## Object Examples
@@ -82,42 +208,19 @@ export class List {
 }
 ```
   
--> [*Recommended Values]
+*Recommended Values
 
 <a name="example"></a>
-## Implementation Example
-```
- <lib-abcalendar-lib
-      [initialDate]="getInitialDate()"
-      [initialView]="'month'"
-      [views]="['year', 'month', 'week', 'day']"
-      [events]="getEvents()"
-      [localeValue]="createLocalValue()"
-      (eventClick)="setItem($event)"
-    >
- </lib-abcalendar-lib>
-```
- 
- #### How to use $event?
- Just give $event to Method in header an take the Values you need <br/>
- 
- **Example:** <br/>
- ```
-  setItem($event: Item): void {
-     console.log($event.title);
-   }
-```
 
 ## Pictures
-
 This is an example for the YearView with some Events:
-![year view](./src/assets/expampleImages/yearview.jpg)
+![year view](./src/assets/exampleImages/yearView.jpg)
 
 This is an example for the MonthView with some Events:
-![year view](./src/assets/expampleImages/monthview.jpg)
+![month view](./src/assets/exampleImages/monthView.jpg)
 
 This is an example for the WeekView with some Events:
-![year view](./src/assets/expampleImages/weekview.jpg)
+![week view](./src/assets/exampleImages/weekView.jpg)
 
 This is an example for the DayView with some Events:
-![year view](./src/assets/expampleImages/dayview.jpg)
+![day view](./src/assets/exampleImages/dayView.jpg)
