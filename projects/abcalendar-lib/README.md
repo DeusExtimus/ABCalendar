@@ -131,6 +131,12 @@ Configurable values:
         ```
         -> string must be in locale-Format (example: en-US, de-De)
         
+    * config for [theme]:
+        * in .html:
+        ```
+        [theme] = "'dark'"
+        ```
+    
     * usage of (eventEmitter):
         * in .html:
         ```
@@ -168,6 +174,11 @@ Configurable values:
 [event]:
 * Item[]: (id, title, color, list, dateOfExpiry)
 * Optional: list, color
+
+[theme]:
+* string
+* Choice: 'dark','light'
+* default: 'dark'
 
 ## Output Types
 

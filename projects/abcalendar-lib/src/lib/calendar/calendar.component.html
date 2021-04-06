@@ -35,14 +35,16 @@
               <h5 class="user-select-none" style="font-weight: bolder">{{localeValue.months[f]}}</h5>
             </div>
             <div class="row col-12 ms-0 user-select-none overflow-hidden">
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
-              <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
-
+              <div class="row text-center mx-0 px-0"
+                   [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[0]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[1]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[2]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[3]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[4]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[5]}}</h5></div>
+                <div class="w-14"><h5 [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[6]}}</h5></div>
+              </div>
               <div *ngFor="let beforeDay of numSequence(getEmptyStartDays(f)); let ac = index;"
                    class="border w-14 vh-9 lgOnHover">
               </div>
@@ -74,13 +76,22 @@
     <!--MONATSANSICHT-->
     <div *ngIf="initialView == 'month'">
       <div class="row">
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[0]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[1]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[2]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[3]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[4]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[5]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[6]}}</h5></div>
+        <div class="row text-center mx-0 px-0" [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[0]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[1]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[2]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[3]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[4]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[5]}}</h5></div>
+          <div class="w-14"><h5 class="user-select-none"
+                                [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[6]}}</h5></div>
+        </div>
         <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
              class="border w-14 vh-15 lgOnHover crop user-select-none">
         </div>
@@ -112,14 +123,21 @@
     <div *ngIf="initialView == 'week'">
       <div class="justify-content-center">
         <div class="border border-light">
-          <div class="row">
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[0]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[1]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[2]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[3]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[4]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[5]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[6]}}</h5></div>
+          <div class="row text-center" [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[0]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[1]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[2]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[3]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[4]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[5]}}</h5></div>
+            <div class="w-14"><h5 class="user-select-none"
+                                  [ngClass]="{'lg': theme == 'dark'}">{{localeValue.weekdays[6]}}</h5></div>
           </div>
         </div>
         <div class="row">
@@ -144,18 +162,21 @@
       <div class="row justify-content-center">
         <div class="w-100">
           <div class="row">
-            <div class="border border-grey w-14 bg-dark min-height">
-              <div class="lg user-select-none">
+            <div class="border border-grey w-14 min-height"
+                 [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+              <div class="user-select-none" [ngClass]="{'lg': theme == 'dark'}">
                 {{localeValue.others[5]}}
               </div>
             </div>
             <div class="w-85">
-              <div *ngFor="let item of events">
-                <div *ngIf="isAllDayItem(item) && correctDate(item, day - 1)">
-                  <div class="border border-grey h-50 justify-content-center">
-                    <div class="rounded w-100 border border-dark crop pointer" (click)="eventClick.emit(item)"
-                         [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
-                      {{item.title}}
+              <div class="border border-grey h-50 min-height px-0 mx-0">
+                <div *ngFor="let item of events">
+                  <div *ngIf="isAllDayItem(item) && correctDate(item, day-1)">
+                    <div class="justify-content-center">
+                      <div class="rounded w-100 border border-dark crop pointer" (click)="eventClick.emit(item)"
+                           [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                        {{item.title}}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -165,8 +186,9 @@
           <div class="h-2px"></div>
           <div *ngFor="let counter of numSequence(24); let hours = index; ">
             <div class="row">
-              <div class="border border-grey w-14 bg-dark h-50px">
-                <div class="lg user-select-none">
+              <div class="border border-grey w-14 h-50px"
+                   [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+                <div class="user-select-none" [ngClass]="{'lg': theme == 'dark'}">
                   {{getHoursOfDay(hours)}}
                 </div>
               </div>

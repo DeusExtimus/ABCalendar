@@ -6,7 +6,6 @@ import {Component, Input, OnInit, Output, EventEmitter, Injectable} from '@angul
   styleUrls: ['./calendar.component.css']
 })
 
-@Injectable({providedIn: 'root'})
 export class CalendarComponent implements OnInit {
 
   @Input()
@@ -17,9 +16,10 @@ export class CalendarComponent implements OnInit {
   events: Item[];
   @Input()
   views: string[];
-
   @Input()
   localeValue: Local;
+  @Input()
+  theme: string;
 
   @Output()
   eventClick = new EventEmitter<Item>();
@@ -74,6 +74,7 @@ export class CalendarComponent implements OnInit {
     this.checkEvents();
     this.prepareButtons();
     this.setLocaleForCalendar();
+    this.setTheme();
   }
 
   getMonthsForLocale(locale): string[] {
@@ -394,6 +395,14 @@ export class CalendarComponent implements OnInit {
       this.localeValue = this.defLocales.localeEn;
     } else if ('de-De') {
       this.localeValue = this.defLocales.localeDe;
+    }
+  }
+
+  private setTheme(): void {
+    if (this.theme === 'light' || this.theme === 'Light') {
+      this.theme = 'light';
+    } else {
+      this.theme = 'dark';
     }
   }
 }
