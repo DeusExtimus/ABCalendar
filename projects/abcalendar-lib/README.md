@@ -11,6 +11,7 @@ Configurable values:
 - Object with Locale Values
 - Event input
 - Event output (on Click)
+- Day output (on Click)
 
 ## Setup a program with ABCalendar
 
@@ -151,6 +152,18 @@ Configurable values:
         }
         ```
         
+    * usage of (dayEmitter):
+            * in .html:
+            ```
+            (dayEmitter) = "getDay($event)"
+            ```
+            * in .ts:
+            ```
+            getDay($event): void {
+                console.log($event);
+            }
+            ```
+            
 ## Input types
 [views]: 
 * string[]
@@ -177,13 +190,16 @@ Configurable values:
 
 [theme]:
 * string
-* Choice: 'dark','light'
+* Choice: 'night', 'dark','light'
 * default: 'dark'
 
 ## Output Types
 
 (eventEmitter):
 * Item
+
+(dayEmitter):
+* Date
 
 ## Object Examples
 
@@ -220,18 +236,3 @@ export class List {
 ```
   
 *Recommended Values
-
-<a name="example"></a>
-
-## Pictures
-This is an example for the YearView with some Events:
-![year view](../../assets/exampleImages/yearView.jpg)
-
-This is an example for the MonthView with some Events:
-![month view](../../assets/exampleImages/monthView.jpg)
-
-This is an example for the WeekView with some Events:
-![week view](../../assets/exampleImages/weekView.jpg)
-
-This is an example for the DayView with some Events:
-![day view](../../assets/exampleImages/dayView.jpg)

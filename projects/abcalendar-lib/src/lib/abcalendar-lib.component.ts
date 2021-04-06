@@ -10,6 +10,7 @@ import {Item, Local} from './calendar/calendar.component';
       [initialDate]="initialDate"
       [events]="events"
       (eventClick)="setEvent($event)"
+      (dayClick)="setDay($event)"
       [localeValue]="localeValue"
     ></lib-calendar>
   `,
@@ -33,11 +34,17 @@ export class AbcalendarLibComponent implements OnInit {
 
   @Output()
   eventEmitter = new EventEmitter<Item>();
+  @Output()
+  dayEmitter = new EventEmitter<Date>();
 
   ngOnInit(): void {
   }
 
   setEvent($event: Item): void {
     this.eventEmitter.emit($event);
+  }
+
+  setDay($event: Date): void {
+    this.dayEmitter.emit($event);
   }
 }

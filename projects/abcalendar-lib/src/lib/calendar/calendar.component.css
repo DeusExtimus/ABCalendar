@@ -10,6 +10,10 @@
   cursor: pointer;
 }
 
+.mb-05 {
+  margin-bottom: .15rem !important
+}
+
 .h-2px {
   height: 2px;
 }
@@ -31,6 +35,14 @@
 }
 
 .lg {
+  color: #d3d3d3;
+}
+
+.dg {
+  color: grey;
+}
+
+.dg:hover {
   color: #d3d3d3;
 }
 
@@ -66,4 +78,8 @@
 .col-05 {
   flex: 0 0 auto;
   width: 3.3333333333%
+}
+
+.gOnHover:hover{
+  background-color: grey;
 }

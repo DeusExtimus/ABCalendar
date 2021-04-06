@@ -23,6 +23,8 @@ export class CalendarComponent implements OnInit {
 
   @Output()
   eventClick = new EventEmitter<Item>();
+  @Output()
+  dayClick = new EventEmitter<Date>();
 
   today: Date = new Date(Date.now());
   year: number;
@@ -40,7 +42,7 @@ export class CalendarComponent implements OnInit {
     localeEn: {
       weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-      others: ['Year', 'Week', 'Month', 'Day', 'Today', 'All Day'],
+      others: ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'],
       lang: null
     },
     localeDe: {
@@ -284,13 +286,15 @@ export class CalendarComponent implements OnInit {
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
     let a;
     if (rightMonth == null) {
-      a = Date.UTC(this.year, new Date(Date.now()).getMonth(), dayNumber + 1);
+      a = Date.UTC(new Date(Date.now()).getFullYear(), new Date(Date.now()).getMonth(), dayNumber + 1);
     } else {
-      a = Date.UTC(this.year, rightMonth, dayNumber + 1);
+      a = Date.UTC(new Date(Date.now()).getFullYear(), rightMonth, dayNumber + 1);
     }
     const b = Date.UTC(this.year, this.month, this.today.getDate());
-    if (a === b) {
+    if (a === b && this.theme !== 'night') {
       return '#d0d0f5';
+    } else if (a === b && this.theme === 'night') {
+      return '#67676b';
     }
   }
 
@@ -401,9 +405,32 @@ export class CalendarComponent implements OnInit {
   private setTheme(): void {
     if (this.theme === 'light' || this.theme === 'Light') {
       this.theme = 'light';
+    } else if (this.theme === 'night' || this.theme === 'Night') {
+      this.theme = 'night';
     } else {
       this.theme = 'dark';
     }
+  }
+
+  emitDayClick(dayNumber: number, f?: number): void {
+    if (f == null) {
+      f = this.month;
+    }
+    const date = new Date(this.year, f, dayNumber + 1);
+    this.dayClick.emit(date);
+  }
+
+  emitDayClickAfterDays(dayNumber: number, f?: number): void {
+    let date;
+    if (f == null) {
+      f = this.month;
+    }
+    if (f + 1 < 12) {
+      date = new Date(this.year, f + 1, dayNumber + 1);
+    } else {
+      date = new Date(this.year, f + 1, dayNumber + 1);
+    }
+    this.dayClick.emit(date);
   }
 }
 
@@ -423,8 +450,8 @@ export interface List {
 }
 
 export interface Local {
-  weekdays ?: string[];
-  months ?: string[];
-  others ?: string[];
-  lang ?: string;
+  weekdays?: string[];
+  months?: string[];
+  others?: string[];
+  lang?: string;
 }
