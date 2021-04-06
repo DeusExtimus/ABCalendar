@@ -10,7 +10,7 @@
           <button type="button" class="btn btn-outline-dark" (click)="next()">&#62;</button>
         </div>
       </div>
-      <div class="col-4 text-center"><h1>{{setTitle()}}</h1></div>
+      <div class="col-4 text-center"><h1 class="user-select-none">{{setTitle()}}</h1></div>
       <div class="col-4">
         <div class="btn-group text-right" role="group">
           <button type="button" class="btn btn-outline-dark" *ngIf="yBtn"
@@ -32,9 +32,9 @@
           <div class="col-12 justify-content-center">
             <!--            Monthnames-->
             <div class="container-fluid text-center">
-              <h5 style="font-weight: bolder">{{localeValue.months[f]}}</h5>
+              <h5 class="user-select-none" style="font-weight: bolder">{{localeValue.months[f]}}</h5>
             </div>
-            <div class="row col-12 ms-0">
+            <div class="row col-12 ms-0 user-select-none overflow-hidden">
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
@@ -49,7 +49,7 @@
               <div *ngFor="let currentDay of numSequence(getDaysOfMonth(f)); let dayNumber = index;"
                    class="border text-start w-14 vh-9 lgOnHover crop"
                    [ngStyle]="{'background-color': colorOfTheDay(dayNumber, f)}">
-                <div class="ms-0">
+                <div class="ms-0 user-select-none">
                   {{dayNumber + 1}}
                 </div>
                 <div class="row ms-n2">
@@ -62,7 +62,7 @@
                 </div>
               </div>
               <div *ngFor="let afterDay of numSequence(getEmptyEndDays(f)); let daysOfNextMonth = index;"
-                   class="border w-14 vh-9 lg lgOnHover text-start">
+                   class="border w-14 vh-9 lg lgOnHover text-start user-select-none">
                 {{daysOfNextMonth + 1}}
               </div>
             </div>
@@ -74,20 +74,20 @@
     <!--MONATSANSICHT-->
     <div *ngIf="initialView == 'month'">
       <div class="row">
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
-        <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[0]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[1]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[2]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[3]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[4]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[5]}}</h5></div>
+        <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[6]}}</h5></div>
         <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
-             class="border w-14 vh-15 lgOnHover crop">
+             class="border w-14 vh-15 lgOnHover crop user-select-none">
         </div>
         <div *ngFor="let currentday of numSequence(getDaysOfMonth()); let dayNumber = index"
              class="border text-start w-14 vh-15 lgOnHover crop"
              [ngStyle]="{'background-color': colorOfTheDay(dayNumber)}">
-          <div class="ms-2">
+          <div class="ms-2 user-select-none">
             {{dayNumber + 1}}
           </div>
           <div *ngFor="let item of events">
@@ -101,7 +101,7 @@
         </div>
         <div *ngFor="let afterday of numSequence(getEmptyEndDays()); let daysOfNextMonth = index;"
              class="border text-start w-14 vh-15 lg crop lgOnHover">
-          <div class="ms-2">
+          <div class="ms-2 user-select-none user-select-none">
             {{daysOfNextMonth + 1}}
           </div>
         </div>
@@ -113,13 +113,13 @@
       <div class="justify-content-center">
         <div class="border border-light">
           <div class="row">
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[3]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[4]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[5]}}</h5></div>
-            <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[6]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[0]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[1]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[2]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[3]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[4]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[5]}}</h5></div>
+            <div class="bg-dark text-center w-14"><h5 class="lg user-select-none">{{localeValue.weekdays[6]}}</h5></div>
           </div>
         </div>
         <div class="row">
@@ -145,7 +145,7 @@
         <div class="w-100">
           <div class="row">
             <div class="border border-grey w-14 bg-dark min-height">
-              <div class="lg">
+              <div class="lg user-select-none">
                 {{localeValue.others[5]}}
               </div>
             </div>
@@ -166,7 +166,7 @@
           <div *ngFor="let counter of numSequence(24); let hours = index; ">
             <div class="row">
               <div class="border border-grey w-14 bg-dark h-50px">
-                <div class="lg">
+                <div class="lg user-select-none">
                   {{getHoursOfDay(hours)}}
                 </div>
               </div>
