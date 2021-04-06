@@ -84,7 +84,17 @@
                    class="border w-14 vh-9 lg lgOnHover text-start user-select-none"
                    (click)="emitDayClickAfterDays(daysOfNextMonth, f)"
                    [ngClass]="{'gOnHover dg': theme == 'night'}">
-                {{daysOfNextMonth + 1}}
+                <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
+                  {{daysOfNextMonth + 1}}
+                </div>
+                <div class="row ms-n2">
+                  <div *ngFor="let item of events" class="col-05 px-2">
+                    <div *ngIf="correctDate(item, daysOfNextMonth, f + 1)" class="dot crop pointer ms-0"
+                         [ngStyle]="{'background-color': getItemColor(item)}"
+                         (click)="eventClick.emit(item)">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -125,6 +135,14 @@
              (click)="emitDayClickAfterDays(daysOfNextMonth)">
           <div class="ms-2 user-select-none user-select-none">
             {{daysOfNextMonth + 1}}
+          </div>
+          <div *ngFor="let item of events">
+            <div *ngIf="correctDate(item, daysOfNextMonth, month + 1)">
+              <div class="ms-1 border border-dark crop rounded m-1 crop pointer" (click)="eventClick.emit(item)"
+                   [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+                {{item.title}}
+              </div>
+            </div>
           </div>
         </div>
       </div>
