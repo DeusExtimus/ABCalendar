@@ -398,7 +398,7 @@ export class CalendarComponent implements OnInit {
   }
 }
 
-export class Item {
+export interface Item {
   itemId?: number;
   list?: List;
   title: string;
@@ -406,14 +406,14 @@ export class Item {
   dateOfExpiry: Date;
 }
 
-export class List {
+export interface List {
   listId?: number;
   item?: Item[];
   title?: string | undefined;
   dateOfExpiry?: Date;
 }
 
-export class Local {
+export interface Local {
   weekdays ?: string[];
   months ?: string[];
   others ?: string[];
