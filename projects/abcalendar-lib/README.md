@@ -153,16 +153,16 @@ Configurable values:
         ```
         
     * usage of (dayEmitter):
-            * in .html:
-            ```
-            (dayEmitter) = "getDay($event)"
-            ```
-            * in .ts:
-            ```
-            getDay($event): void {
-                console.log($event);
-            }
-            ```
+        * in .html:
+         ```
+         (dayEmitter) = "getDay($event)"
+         ```
+         * in .ts:
+         ```
+         getDay($event): void {
+             console.log($event);
+         }
+         ```
             
 ## Input types
 [views]: 
