@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <div class="ml-5 mr-5 text-center">
+  <div class="ms-5 me-5 text-center">
     <!--  HEADER-->
     <div class="row mt-5">
       <div class="col-4">
@@ -26,15 +26,15 @@
     </div>
 
     <!--JAHRESANSICHT-->
-    <div class="row" *ngIf="initialView =='year'">
-      <div *ngFor="let column of numSequence(12); let f = index;" class="col-lg-4 mt-3">
+    <div class="row col-12" *ngIf="initialView =='year'">
+      <div *ngFor="let column of numSequence(12); let f = index;" class="col-4 mt-3">
         <div class="border">
           <div class="col-12 justify-content-center">
             <!--            Monthnames-->
             <div class="container-fluid text-center">
               <h5 style="font-weight: bolder">{{localeValue.months[f]}}</h5>
             </div>
-            <div class="row">
+            <div class="row col-12 ms-0">
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[0]}}</h5></div>
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[1]}}</h5></div>
               <div class="bg-dark text-center w-14"><h5 class="lg">{{localeValue.weekdays[2]}}</h5></div>
@@ -47,14 +47,14 @@
                    class="border w-14 vh-9 lgOnHover">
               </div>
               <div *ngFor="let currentDay of numSequence(getDaysOfMonth(f)); let dayNumber = index;"
-                   class="border text-left w-14 vh-9 lgOnHover crop"
+                   class="border text-start w-14 vh-9 lgOnHover crop"
                    [ngStyle]="{'background-color': colorOfTheDay(dayNumber, f)}">
-                <div class="ml-2">
+                <div class="ms-0">
                   {{dayNumber + 1}}
                 </div>
-                <div class="row ml-2">
-                  <div *ngFor="let item of events">
-                    <div *ngIf="correctDate(item, dayNumber, f)" class="dot crop pointer ml-1"
+                <div class="row ms-n2">
+                  <div *ngFor="let item of events" class="col-05 px-2">
+                    <div *ngIf="correctDate(item, dayNumber, f)" class="dot crop pointer ms-0"
                          [ngStyle]="{'background-color': getItemColor(item)}"
                          (click)="eventClick.emit(item)">
                     </div>
@@ -62,7 +62,7 @@
                 </div>
               </div>
               <div *ngFor="let afterDay of numSequence(getEmptyEndDays(f)); let daysOfNextMonth = index;"
-                   class="border w-14 vh-9 lg lgOnHover">
+                   class="border w-14 vh-9 lg lgOnHover text-start">
                 {{daysOfNextMonth + 1}}
               </div>
             </div>
@@ -85,14 +85,14 @@
              class="border w-14 vh-15 lgOnHover crop">
         </div>
         <div *ngFor="let currentday of numSequence(getDaysOfMonth()); let dayNumber = index"
-             class="border text-left w-14 vh-15 lgOnHover crop"
+             class="border text-start w-14 vh-15 lgOnHover crop"
              [ngStyle]="{'background-color': colorOfTheDay(dayNumber)}">
-          <div class="ml-2">
+          <div class="ms-2">
             {{dayNumber + 1}}
           </div>
           <div *ngFor="let item of events">
             <div *ngIf="correctDate(item, dayNumber)">
-              <div class="ml-1 border border-dark crop rounded m-1 crop pointer" (click)="eventClick.emit(item)"
+              <div class="ms-1 border border-dark crop rounded m-1 crop pointer" (click)="eventClick.emit(item)"
                    [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
                 {{item.title}}
               </div>
@@ -100,8 +100,8 @@
           </div>
         </div>
         <div *ngFor="let afterday of numSequence(getEmptyEndDays()); let daysOfNextMonth = index;"
-             class="border text-left w-14 vh-15 lg crop lgOnHover">
-          <div class="ml-2">
+             class="border text-start w-14 vh-15 lg crop lgOnHover">
+          <div class="ms-2">
             {{daysOfNextMonth + 1}}
           </div>
         </div>
