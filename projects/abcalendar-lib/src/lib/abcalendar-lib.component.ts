@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Item, Local} from './calendar/calendar.component';
 
 @Component({
@@ -9,17 +9,16 @@ import {Item, Local} from './calendar/calendar.component';
       [initialView]="initialView"
       [initialDate]="initialDate"
       [events]="events"
+      [localeValue]="localeValue"
+      [language]="language"
+      [theme]="theme"
       (eventClick)="setEvent($event)"
       (dayClick)="setDay($event)"
-      [localeValue]="localeValue"
     ></lib-calendar>
   `,
   styles: []
 })
-export class AbcalendarLibComponent implements OnInit {
-
-  constructor() {
-  }
+export class AbcalendarLibComponent {
 
   @Input()
   initialView: string;
@@ -31,14 +30,15 @@ export class AbcalendarLibComponent implements OnInit {
   views: string[];
   @Input()
   localeValue: Local;
+  @Input()
+  language: string;
+  @Input()
+  theme: string;
 
   @Output()
   eventEmitter = new EventEmitter<Item>();
   @Output()
   dayEmitter = new EventEmitter<Date>();
-
-  ngOnInit(): void {
-  }
 
   setEvent($event: Item): void {
     this.eventEmitter.emit($event);

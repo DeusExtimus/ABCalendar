@@ -10,9 +10,10 @@ Configurable values:
 - View selection
 - Initial view
 - Start date
-- Object with Locale Values
+- Language or Object with LocalValue
 - Event input
 - Event output (on Click)
+- Date output (on Click)
 
 ## Setup a program with ABCalendar
 
@@ -70,17 +71,17 @@ Configurable values:
   </lib-abcalendar-lib>
     ```
 - config examples for Input-Values:
-    * config for [views]:
+    * **config for [views]:**
         * in .html:
         ```
       [views] = "['year','month','week','day']"
         ```
-    * config for [initialView]:
+    * **config for [initialView]:**
         * in .html:
       ```
       [initialView]="'month'"
       ```
-    * config for [initialDate]:
+    * **config for [initialDate]:**
         * in .html:
         ```
         [initialDate] = "setInitialDate()"
@@ -91,26 +92,37 @@ Configurable values:
             return new Date(Date.now());
         }
         ```
-    * config for [localeValue]:
-        * in .html:
-        ```
-        [localeValue] = "setLocaleValue()"
-        ```
-        * in .ts:
-        ```
-        import {Local} from 'abcalendar';
-        .
-        .
-        .
-        setLocaleValue(): Local {
-            return {
+    * **config for language**
+        * **config for [language]:**
+            * in .html:
+            ```
+            [language] = "'en-Us'"
+            ```
+            *If your required language is not among the following, please refer to the paragraph *config for [localeValue]* to implement your own language.
+             <br/>
+             'en-..','de-..','ru-..','zh-..','es-..','it-..','fr-..'
+             <br/>
+             PLEASE NOTE: Here the exact pattern must be followed!*
+        * **config for [localeValue]:**
+            * in .html:
+            ```
+            [localeValue] = "setLocaleValue()"
+            ```
+            * in .ts:
+            ```
+            import {Local} from 'abcalendar';
+            .
+            .
+            .
+            setLocaleValue(): Local {
+                return {
                   weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                   months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                   others: ['Year', 'Week', 'Month', 'Day', 'Today', 'All Day']
-                   };
-        }
-        ```
-    * config for [events]:
+                        };
+            }
+            ```
+    * **config for [events]:**
         * in .html:
         ```
         [events] = "getEvents()"
@@ -133,7 +145,7 @@ Configurable values:
         ```
         -> string must be in locale-Format (example: en-US, de-De)
         
-    * usage of (eventEmitter):
+    * **usage of (eventEmitter):**
         * in .html:
         ```
         (eventEmitter) = "setItem($event)"
@@ -146,7 +158,17 @@ Configurable values:
             this.router.navigateByUrl(`randomPageUrl/${$event.itemId}`);
         }
         ```
-        
+    * **usage of (dayEmitter):**
+            * in .html:
+            ```
+            (dayEmitter) = "getDate($event)"
+            ```
+            * in .ts:
+            ```
+            getDate($event): void {
+                console.log($event.getFullYear());
+            }
+            ```
 ## Input types
 [views]: 
 * string[]
@@ -162,6 +184,10 @@ Configurable values:
 * Date
 * default: Date.now()
 
+[language]:
+* string
+* default: en-Us
+
 [localeValue]:
 * Local
 * Local-Pattern: [Locale](#locale)
@@ -176,6 +202,9 @@ Configurable values:
 (eventEmitter):
 * Item
 
+(dateEmitter):
+* Date
+
 ## Object Examples
 
 <a name="locale"></a>
@@ -184,7 +213,7 @@ Configurable values:
 export class Locale {
 weekdays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-others = ["Year", "Week", "Month", "Day", "Today", "All Day"];
+others = ["Year", "Month", "Week", "Day", "Today", "All Day"];
 }
 ```
 <a name="item"></a>
@@ -195,7 +224,9 @@ export class Item {
   list = List;
   * title = "A Title";
   color = "#0e0e0e";
-  * dateOfExpiry = new Date(Date.now());
+  * startDate = new Date(Date.now());
+  endDate = new Date (Date.now());
+  allDayItem = false;
 }
 ```
 

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, EventEmitter, Injectable} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'lib-calendar',
@@ -19,6 +19,8 @@ export class CalendarComponent implements OnInit {
   @Input()
   localeValue: Local;
   @Input()
+  language: string;
+  @Input()
   theme: string;
 
   @Output()
@@ -31,27 +33,7 @@ export class CalendarComponent implements OnInit {
   month: number;
   day: number;
 
-  yBtn = false;
-  mBtn = false;
-  wBtn = false;
-  dBtn = false;
-
-  itemCounter: number;
-
-  defLocales = {
-    localeEn: {
-      weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-      others: ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'],
-      lang: null
-    },
-    localeDe: {
-      weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
-      months: ['Januar', 'Februar', 'Mrz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'OKtober', 'November', 'Dezember'],
-      others: ['Jahr', 'Woche', 'Monat', 'Tag', 'Heute', 'Ganztägig'],
-      lang: null
-    }
-  };
+  directions: string[];
 
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
@@ -70,6 +52,30 @@ export class CalendarComponent implements OnInit {
     return monthAndDay;
   }
 
+  private static setOthers(language: string): string[] {
+    if (language.startsWith('en')) {
+      return ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'];
+    } else if (language.startsWith('de')) {
+      return ['Jahr', 'Monat', 'Woche', 'Tag', 'Heute', 'Ganztägig'];
+    } else if (language.startsWith('ru')) {
+      return ['Год', 'Месяц', 'Неделя', 'День', 'Сегодня', 'Весь день'];
+    } else if (language.startsWith('zh')) {
+      return ['年份', '月份', '周', '日', '今天', '全天'];
+    } else if (language.startsWith('es')) {
+      return ['Año', 'Mes', 'Semana', 'Día', 'Hoy', 'Todo el día'];
+    } else if (language.startsWith('it')) {
+      return ['Anno', 'Mese', 'Settimana', 'Giorno', 'Oggi', 'Tutto il giorno'];
+    } else if (language.startsWith('fr')) {
+      return ['Année', 'Mois', 'Semaine', 'Jour', 'Aujourd\'hui', 'Toute la journée'];
+    } else {
+      console.log('The language ' + language + ' is not implemented yet.' +
+        '\nPlease write an issue on the issue bord and watch out for updates.' +
+        '\nIssue-Board:' +
+        '\nhttps://github.com/DeusExtimus/ABCalendar/issues');
+      return ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'];
+    }
+  }
+
   ngOnInit(): void {
     this.setInitialView();
     this.setInitialDate();
@@ -77,26 +83,6 @@ export class CalendarComponent implements OnInit {
     this.prepareButtons();
     this.setLocaleForCalendar();
     this.setTheme();
-  }
-
-  getMonthsForLocale(locale): string[] {
-    const format = new Intl.DateTimeFormat(locale, {month: 'long'});
-    const months = [];
-    for (let month = 0; month < 12; month++) {
-      const dateToFormat = new Date(Date.UTC(2000, month, 1, 0, 0, 0));
-      months.push(format.format(dateToFormat));
-    }
-    return months;
-  }
-
-  getWeekdaysForLocale(locale): string[] {
-    const format = new Intl.DateTimeFormat(locale, {weekday: 'long'});
-    const weekdays = [];
-    for (let weekday = 0; weekday < 6; weekday++) {
-      const dateToFormat = new Date(Date.UTC(2000, weekday, 1, 0, 0, 0));
-      weekdays.push(format.format(dateToFormat));
-    }
-    return weekdays;
   }
 
   numSequence(n: number): Array<number> {
@@ -266,21 +252,10 @@ export class CalendarComponent implements OnInit {
       month = this.month;
     }
     const dateToCheck = new Date(this.year, month, day + 1, 1, 0, 0, 0);
-    const itemDate = new Date(item.dateOfExpiry);
-    const isCurrentDate =
-      itemDate.getFullYear() === dateToCheck.getFullYear() &&
+    const itemDate = new Date(item.startDate);
+    return itemDate.getFullYear() === dateToCheck.getFullYear() &&
       itemDate.getMonth() === dateToCheck.getMonth() &&
       dateToCheck.getDate() === itemDate.getDate();
-    if (isCurrentDate) {
-      this.itemCounter++;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  isToLate(): boolean {
-    return this.itemCounter <= 3;
   }
 
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
@@ -307,7 +282,7 @@ export class CalendarComponent implements OnInit {
   }
 
   isAllDayItem(item: Item): boolean {
-    return new Date(item.dateOfExpiry).getDate() === this.day;
+    return new Date(item.startDate).getDate() === this.day;
   }
 
   getDatesOfWeek(indexDay: number): number {
@@ -315,13 +290,13 @@ export class CalendarComponent implements OnInit {
     return startDate.getDate() + indexDay;
   }
 
-  resetCounter(): void {
-    this.itemCounter = 0;
-  }
-
-  private setInitialView(): void {
-    if (this.initialView == null) {
-      this.initialView = 'month';
+  setInitialView(view?: string): void {
+    if (view == null) {
+      if (this.initialView == null) {
+        this.initialView = 'month';
+      }
+    } else {
+      this.initialView = view;
     }
   }
 
@@ -363,43 +338,51 @@ export class CalendarComponent implements OnInit {
   }
 
   private prepareButtons(): void {
+    const tempArray = [];
     if (this.views == null) {
-      this.mBtn = true;
-      this.wBtn = true;
-      this.dBtn = true;
-      this.yBtn = true;
+      this.views = ['year', 'month', 'week', 'day'];
     } else {
       for (const btn of this.views) {
-        switch (btn) {
-          case 'year': {
-            this.yBtn = true;
-            break;
-          }
-          case 'month': {
-            this.mBtn = true;
-            break;
-          }
-          case 'week': {
-            this.wBtn = true;
-            break;
-          }
-          case 'day': {
-            this.dBtn = true;
-            break;
-          }
+        if (btn === 'year') {
+          tempArray[0] = 'year';
+        }
+        if (btn === 'month') {
+          tempArray[1] = 'month';
+        }
+        if (btn === 'week') {
+          tempArray[2] = 'week';
+        }
+        if (btn === 'day') {
+          tempArray[3] = 'day';
+        }
+        if (btn !== 'year' && btn !== 'month' && btn !== 'week' && btn !== 'day') {
+          console.log(`The Value ${btn} is not part of possible values.
+          \nPlease watch the Documentation to see the possible values:
+          \nhttps://www.npmjs.com/package/abcalendar`);
         }
       }
+      this.views = tempArray;
     }
   }
 
   private setLocaleForCalendar(): void {
-    if (this.localeValue == null) {
-      this.localeValue = this.defLocales.localeEn;
-    } else if (this.localeValue.lang === 'en-En' || this.localeValue.lang === 'en-US') {
-      this.localeValue = this.defLocales.localeEn;
-    } else if ('de-De') {
-      this.localeValue = this.defLocales.localeDe;
+    const weekday: string[] = [];
+    const monthnames: string[] = [];
+    if (this.language == null) {
+      this.language = 'en-Us';
     }
+
+    for (let date = 1; date < 8; date++) {
+      const objDate = new Date(2021, 2, date);
+      weekday.push(objDate.toLocaleString(this.language, {weekday: 'short'}));
+    }
+    for (let month = 0; month < 12; month++) {
+      const objDate = new Date(2021, month, 1);
+      monthnames.push(objDate.toLocaleString(this.language, {month: 'long'}));
+    }
+
+    this.localeValue = {weekdays: weekday, months: monthnames, others: CalendarComponent.setOthers(this.language)};
+    this.directions = ['<', CalendarComponent.setOthers(this.language)[4], '>'];
   }
 
   private setTheme(): void {
@@ -432,6 +415,53 @@ export class CalendarComponent implements OnInit {
     }
     this.dayClick.emit(date);
   }
+
+  getWidthOfContainer(item: Item): string {
+    if (item.allDayItem) {
+      return 11.5 + '%';
+    } else {
+      const val = item.endDate.getDate() - item.startDate.getDate();
+      switch (val + 1) {
+        case 1:
+          return 11.5 + '%';
+        case 2:
+          return 24 + '%';
+        case 3:
+          return 38 + '%';
+        case 4:
+          return 51 + '%';
+        case 5:
+          return 65 + '%';
+        case 6:
+          return 78 + '%';
+        case 7:
+          return 91 + '%';
+      }
+    }
+  }
+
+  navToDirection(content: string): void {
+    if (content === '<') {
+      this.prev();
+    } else if (content === '>') {
+      this.next();
+    } else {
+      this.currentDay();
+    }
+  }
+
+  showViewInWriteLang(view: string): string {
+    switch (view) {
+      case 'year':
+        return this.localeValue.others[0];
+      case 'month':
+        return this.localeValue.others[1];
+      case 'week':
+        return this.localeValue.others[2];
+      case 'day':
+        return this.localeValue.others[3];
+    }
+  }
 }
 
 export interface Item {
@@ -439,7 +469,9 @@ export interface Item {
   list?: List;
   title: string;
   color?: string;
-  dateOfExpiry: Date;
+  allDayItem?: boolean | false;
+  startDate: Date;
+  endDate?: Date;
 }
 
 export interface List {
@@ -453,5 +485,4 @@ export interface Local {
   weekdays?: string[];
   months?: string[];
   others?: string[];
-  lang?: string;
 }

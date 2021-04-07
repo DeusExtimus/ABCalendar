@@ -1,42 +1,33 @@
 <div class="container-fluid" [ngClass]="{'bg-dark': theme == 'night'}">
-  <div class="ms-5 me-5 mt-5 text-center">
+  <div class="ms-5 me-5 text-center">
     <!--  HEADER-->
-    <div class="row mt-5  d-flex align-items-center">
-      <div class="col-4">
+    <div class="row d-flex align-items-center">
+      <!--        PREV-TODAY-NEXT-BUTTONS-->
+      <div class="col-4 mt-3">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-outline-dark"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="prev()"><span [ngClass]="{'lg': theme == 'night'}">&#60;</span></button>
-          <button type="button" class="btn btn-outline-dark"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="currentDay()"><span [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[4]}}</span>
-          </button>
-          <button type="button" class="btn btn-outline-dark"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="next()"><span [ngClass]="{'lg': theme == 'night'}">&#62;</span></button>
+          <div *ngFor="let content of directions">
+            <button
+              [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night',
+                                'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+              (click)="navToDirection(content)"><span [ngClass]="{'lg': theme == 'night'}">{{content}}</span>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="col-4 text-center">
+      <!--      TITLE-->
+      <div class="col-4 mt-3 text-center">
         <h1 class="user-select-none" [ngClass]="{'lg': theme == 'night'}">{{setTitle()}}</h1>
       </div>
-      <div class="col-4">
-        <div class="btn-group text-right" role="group">
-          <button type="button" class="btn btn-outline-dark" *ngIf="yBtn"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="initialView = 'year'; itemCounter = 0"><span
-            [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[0]}}</span></button>
-          <button type="button" class="btn btn-outline-dark" *ngIf="mBtn"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="initialView = 'month'; itemCounter = 0"><span
-            [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[1]}}</span></button>
-          <button type="button" class="btn btn-outline-dark" *ngIf="wBtn"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="initialView = 'week'; itemCounter = 0"><span
-            [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[2]}}</span></button>
-          <button type="button" class="btn btn-outline-dark" *ngIf="dBtn"
-                  [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="initialView = 'day'; itemCounter = 0"><span
-            [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[3]}}</span></button>
+      <!--      VIEW-BUTTONS-->
+      <div class="col-4 mt-3">
+        <div class="btn-group" role="group">
+          <div *ngFor="let view of views">
+            <button type="button" class="btn btn-outline-dark"
+                    [ngClass]="{'btn btn-dark gOnHover border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                    (click)="setInitialView(view)">
+              <span [ngClass]="{'lg': theme == 'night'}">{{showViewInWriteLang(view)}}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -84,7 +75,7 @@
                    class="border w-14 vh-9 lg lgOnHover text-start user-select-none"
                    (click)="emitDayClickAfterDays(daysOfNextMonth, f)"
                    [ngClass]="{'gOnHover dg': theme == 'night'}">
-                <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
+                <div class="ms-0 user-select-none" [ngClass]="{'dg': theme == 'night'}">
                   {{daysOfNextMonth + 1}}
                 </div>
                 <div class="row ms-n2">
@@ -105,35 +96,41 @@
     <!--MONATSANSICHT-->
     <div *ngIf="initialView == 'month'">
       <div class="row">
+        <!--        WEEKDAYNAMES-->
         <div class="row text-center mx-0 px-0" [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
           <div *ngFor="let weekdayName of localeValue.weekdays" class="w-14 user-select-none">
             <h5 [ngClass]="{'lg': theme == 'dark'}">{{weekdayName}}</h5>
           </div>
         </div>
+        <!--        DAYS FOR PREV MONTH-->
         <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
              class="border w-14 vh-15 lgOnHover crop user-select-none" [ngClass]="{'gOnHover': theme == 'night'}">
         </div>
+        <!--        DAYS OF CURRENT MONTH-->
         <div *ngFor="let currentday of numSequence(getDaysOfMonth()); let dayNumber = index"
-             class="border text-start w-14 vh-15 lgOnHover crop"
+             class="border text-start w-14 vh-15 lgOnHover overflow-visible"
              [ngStyle]="{'background-color': colorOfTheDay(dayNumber)}"
              [ngClass]="{'gOnHover lg': theme == 'night'}"
              (click)="emitDayClick(dayNumber)">
+          <!--          DAYNUMBER-->
           <div class="ms-2 user-select-none">
             {{dayNumber + 1}}
           </div>
+          <!--          EVENT-->
           <div *ngFor="let item of events">
             <div *ngIf="correctDate(item, dayNumber)">
-              <div class="ms-1 border border-dark crop rounded m-1 crop pointer" (click)="eventClick.emit(item)"
-                   [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+              <div class="ms-1 border border-dark crop rounded m-1 pointer" (click)="eventClick.emit(item)"
+                   [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item)), 'width': getWidthOfContainer(item)}">
                 {{item.title}}
               </div>
             </div>
           </div>
         </div>
+        <!--        DAYS OF NEXT MONTH-->
         <div *ngFor="let afterday of numSequence(getEmptyEndDays()); let daysOfNextMonth = index;"
              class="border text-start w-14 vh-15 lg crop lgOnHover" [ngClass]="{'gOnHover dg': theme == 'night'}"
              (click)="emitDayClickAfterDays(daysOfNextMonth)">
-          <div class="ms-2 user-select-none user-select-none">
+          <div class="ms-2 user-select-none">
             {{daysOfNextMonth + 1}}
           </div>
           <div *ngFor="let item of events">
