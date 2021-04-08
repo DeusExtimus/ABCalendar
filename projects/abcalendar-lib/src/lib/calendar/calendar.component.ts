@@ -34,6 +34,11 @@ export class CalendarComponent implements OnInit {
   day: number;
 
   directions: string[];
+  privateViews: string[];
+  yBtn: boolean;
+  mBtn: boolean;
+  wBtn: boolean;
+  dBtn: boolean;
 
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
@@ -67,6 +72,8 @@ export class CalendarComponent implements OnInit {
       return ['Anno', 'Mese', 'Settimana', 'Giorno', 'Oggi', 'Tutto il giorno'];
     } else if (language.startsWith('fr')) {
       return ['Année', 'Mois', 'Semaine', 'Jour', 'Aujourd\'hui', 'Toute la journée'];
+    } else if (language.startsWith('ar')) {
+      return ['عام', 'شهر', 'أسبوع', 'يوم - نهار', 'اليوم', 'طوال اليوم'];
     } else {
       console.log('The language ' + language + ' is not implemented yet.' +
         '\nPlease write an issue on the issue bord and watch out for updates.' +
@@ -83,6 +90,10 @@ export class CalendarComponent implements OnInit {
     this.prepareButtons();
     this.setLocaleForCalendar();
     this.setTheme();
+  }
+
+  getNumbersInRightLang(num: number): string {
+    return num.toLocaleString(this.language);
   }
 
   numSequence(n: number): Array<number> {
@@ -274,10 +285,11 @@ export class CalendarComponent implements OnInit {
   }
 
   getHoursOfDay(hours: number): string {
+    const num = 0;
     if (hours >= 10) {
-      return hours.toString();
+      return hours.toLocaleString(this.language);
     } else {
-      return `0${hours}`;
+      return `${num.toLocaleString(this.language)}${hours.toLocaleString(this.language)}`;
     }
   }
 
@@ -338,30 +350,32 @@ export class CalendarComponent implements OnInit {
   }
 
   private prepareButtons(): void {
-    const tempArray = [];
     if (this.views == null) {
-      this.views = ['year', 'month', 'week', 'day'];
+      this.privateViews.push('year');
+      this.privateViews.push('month');
+      this.privateViews.push('week');
+      this.privateViews.push('day');
     } else {
       for (const btn of this.views) {
-        if (btn === 'year') {
-          tempArray[0] = 'year';
-        }
-        if (btn === 'month') {
-          tempArray[1] = 'month';
-        }
-        if (btn === 'week') {
-          tempArray[2] = 'week';
-        }
-        if (btn === 'day') {
-          tempArray[3] = 'day';
-        }
-        if (btn !== 'year' && btn !== 'month' && btn !== 'week' && btn !== 'day') {
-          console.log(`The Value ${btn} is not part of possible values.
-          \nPlease watch the Documentation to see the possible values:
-          \nhttps://www.npmjs.com/package/abcalendar`);
+        switch (btn) {
+          case 'year': {
+            this.yBtn = true;
+            break;
+          }
+          case 'month': {
+            this.mBtn = true;
+            break;
+          }
+          case 'week': {
+            this.wBtn = true;
+            break;
+          }
+          case 'day': {
+            this.dBtn = true;
+            break;
+          }
         }
       }
-      this.views = tempArray;
     }
   }
 
@@ -450,7 +464,7 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  showViewInWriteLang(view: string): string {
+  showViewInRightLang(view: string): string {
     switch (view) {
       case 'year':
         return this.localeValue.others[0];
@@ -461,6 +475,17 @@ export class CalendarComponent implements OnInit {
       case 'day':
         return this.localeValue.others[3];
     }
+  }
+
+  getRightEvents(dayNumber: number, monthNum: number): Item[] {
+    const tempArray: Item[] = [];
+    const date = new Date(this.year, monthNum, dayNumber);
+    for (const item of this.events) {
+      if (date.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
+        tempArray.push(item);
+      }
+    }
+    return tempArray;
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "abcalendar",
-  "version": "1.1.7",
+  "version": "1.1.11",
   "peerDependencies": {
     "@angular/common": "^10.0.14",
     "@angular/core": "^10.0.14",
@@ -9,7 +9,7 @@
   "dependencies": {
     "tslib": "^2.0.0"
   },
-  "description": "**CURRENTLY ONLY ALL DAY & SINGLE DAY EVENTS SUPPORTED**",
+  "description": "**Calendar for Angular-Bootstrap-based Applications**",
   "main": "karma.conf.js",
   "repository": {
     "type": "git",

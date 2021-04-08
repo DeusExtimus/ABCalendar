@@ -55,7 +55,15 @@
 }
 
 .border-grey {
-  border-color: #8f8f8f;
+  border-color: #838282;
+}
+
+.btn-dark {
+  border-color: #838282;
+}
+
+.btn-dark:hover {
+  background-color: grey;
 }
 
 .crop {
