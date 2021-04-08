@@ -100,7 +100,7 @@ Configurable values:
             ```
             *If your required language is not among the following, please refer to the paragraph *config for [localeValue]* to implement your own language.
              <br/>
-             'en-..','de-..','ru-..','zh-..','es-..','it-..','fr-..'
+             'en-..','de-..','ru-..','zh-..','es-..','it-..','fr-..', 'ar-..'
              <br/>
              PLEASE NOTE: Here the exact pattern must be followed!*
         * **config for [localeValue]:**
