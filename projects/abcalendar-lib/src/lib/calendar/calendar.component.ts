@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {OnInit, Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
   selector: 'lib-calendar',
@@ -33,8 +33,6 @@ export class CalendarComponent implements OnInit {
   month: number;
   day: number;
 
-  directions: string[];
-  privateViews: string[];
   yBtn: boolean;
   mBtn: boolean;
   wBtn: boolean;
@@ -110,6 +108,19 @@ export class CalendarComponent implements OnInit {
     return firstDay.getDate();
   }
 
+  monthDays(month?: number): Date[] {
+    if (month == null) {
+      month = this.month;
+    }
+    const days: Date[] = [];
+    let startDate = new Date(this.year, month, 0);
+    for (let i = 1; i <= this.getDaysOfMonth(month); i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
+  }
+
   getEmptyStartDays(f?: number): number {
     let firstDay: Date;
     if (f == null) {
@@ -135,10 +146,19 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  getEmptyEndDays(f?: number): number {
-    const daysOfMonth = this.getDaysOfMonth(f);
-    const getEmptyStartDay = this.getEmptyStartDays(f);
-    return 42 - daysOfMonth - getEmptyStartDay;
+  daysOfNextMonth(month?: number): Date[] {
+    if (month == null) {
+      month = this.month;
+    }
+    const days: Date[] = [];
+    let startDate = new Date(this.year, month + 1, 0);
+    const daysOfMonth = this.getDaysOfMonth(month);
+    const emptyStartDays = this.getEmptyStartDays(month);
+    for (let i = 1; i <= 42 - daysOfMonth - emptyStartDays; i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
   }
 
   prev(): void {
@@ -270,17 +290,17 @@ export class CalendarComponent implements OnInit {
   }
 
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
-    let a;
     if (rightMonth == null) {
-      a = Date.UTC(new Date(Date.now()).getFullYear(), new Date(Date.now()).getMonth(), dayNumber + 1);
-    } else {
-      a = Date.UTC(new Date(Date.now()).getFullYear(), rightMonth, dayNumber + 1);
+      rightMonth = this.month;
     }
-    const b = Date.UTC(this.year, this.month, this.today.getDate());
-    if (a === b && this.theme !== 'night') {
-      return '#d0d0f5';
-    } else if (a === b && this.theme === 'night') {
-      return '#67676b';
+    const compareableDate = new Date(this.year, rightMonth, dayNumber);
+    const comparisonDate = new Date(Date.now());
+    if (compareableDate.setHours(0, 0, 0, 0) === comparisonDate.setHours(0, 0, 0, 0)) {
+      if (this.theme !== 'night') {
+        return '#d0d0f5';
+      } else {
+        return '#67676b';
+      }
     }
   }
 
@@ -297,9 +317,15 @@ export class CalendarComponent implements OnInit {
     return new Date(item.startDate).getDate() === this.day;
   }
 
-  getDatesOfWeek(indexDay: number): number {
-    const startDate = new Date(this.year, this.month, this.day - this.getWholeWeek()[0]);
-    return startDate.getDate() + indexDay;
+  daysOfWeek(): Date[] {
+    const current = new Date(this.year, this.month, this.day);
+    let startDate = new Date(current.setDate((current.getDate() - current.getDay())));
+    const days: Date[] = [];
+    for (let i = 1; i <= 7; i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
   }
 
   setInitialView(view?: string): void {
@@ -310,6 +336,116 @@ export class CalendarComponent implements OnInit {
     } else {
       this.initialView = view;
     }
+  }
+
+  emitDayClick(dayNumber: number, f?: number): void {
+    if (f == null) {
+      f = this.month;
+    }
+    const date = new Date(this.year, f, dayNumber + 1);
+    this.dayClick.emit(date);
+  }
+
+  emitDayClickAfterDays(dayNumber: number, f?: number): void {
+    let date;
+    if (f == null) {
+      f = this.month;
+    }
+    if (f + 1 < 12) {
+      date = new Date(this.year, f + 1, dayNumber + 1);
+    } else {
+      date = new Date(this.year, f + 1, dayNumber + 1);
+    }
+    this.dayClick.emit(date);
+  }
+
+  showViewInRightLang(view: string): string {
+    switch (view) {
+      case 'year':
+        return this.localeValue.others[0];
+      case 'month':
+        return this.localeValue.others[1];
+      case 'week':
+        return this.localeValue.others[2];
+      case 'day':
+        return this.localeValue.others[3];
+    }
+  }
+
+  rightEvents(dayNumber: number, monthNum?: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
+    }
+    if (monthNum == null) {
+      monthNum = this.month;
+    }
+
+    const date = new Date(this.year, monthNum, dayNumber);
+
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.allDayItem === false) {
+        let itemDay = new Date(item.startDate);
+        while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
+          if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
+            tempArray.push(item);
+          }
+          itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
+        }
+      } else {
+        item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
+        const newDate = new Date(this.year, monthNum, dayNumber);
+        if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
+          tempArray.push(item);
+        }
+      }
+    }
+
+    // set eventLenght
+    for (const item of tempArray) {
+      if (!item.allDayItem) {
+        item.eventLenght = item.endDate.setHours(0, 0, 0, 0) - item.startDate.setHours(0, 0, 0, 0);
+      } else {
+        item.eventLenght = 1;
+      }
+    }
+
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
+  isStartDate(item: Item, dayNumber: number, month?: number): boolean {
+    if (month == null) {
+      month = this.month;
+    }
+    const date = new Date(this.year, month, dayNumber);
+    return item.startDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+  }
+
+  isEndDate(item: Item, dayNumber: number, month?: number): boolean {
+    if (month == null) {
+      month = this.month;
+    }
+    const date = new Date(this.year, month, dayNumber);
+    return item.endDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+  }
+
+  startDayIsEndDay(item: Item): boolean {
+    return item.startDate === item.endDate;
+  }
+
+  private comperateEventLenght(): (a: any, b: any) => number {
+    const property = 'eventLenght';
+    return (a, b) => {
+      return (a[property] - b[property]) * -1;
+    };
   }
 
   private setInitialDate(): void {
@@ -327,6 +463,16 @@ export class CalendarComponent implements OnInit {
   private checkEvents(): void {
     if (this.events === null) {
       console.log('NO EVENTS');
+    } else {
+      for (const event of this.events) {
+        if (event.allDayItem == null) {
+          if (event.endDate == null) {
+            event.allDayItem = true;
+          } else {
+            event.allDayItem = event.startDate.setHours(0, 0, 0, 0) === event.endDate.setHours(0, 0, 0, 0);
+          }
+        }
+      }
     }
   }
 
@@ -351,10 +497,10 @@ export class CalendarComponent implements OnInit {
 
   private prepareButtons(): void {
     if (this.views == null) {
-      this.privateViews.push('year');
-      this.privateViews.push('month');
-      this.privateViews.push('week');
-      this.privateViews.push('day');
+      this.yBtn = true;
+      this.mBtn = true;
+      this.wBtn = true;
+      this.dBtn = true;
     } else {
       for (const btn of this.views) {
         switch (btn) {
@@ -396,7 +542,6 @@ export class CalendarComponent implements OnInit {
     }
 
     this.localeValue = {weekdays: weekday, months: monthnames, others: CalendarComponent.setOthers(this.language)};
-    this.directions = ['<', CalendarComponent.setOthers(this.language)[4], '>'];
   }
 
   private setTheme(): void {
@@ -409,84 +554,6 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  emitDayClick(dayNumber: number, f?: number): void {
-    if (f == null) {
-      f = this.month;
-    }
-    const date = new Date(this.year, f, dayNumber + 1);
-    this.dayClick.emit(date);
-  }
-
-  emitDayClickAfterDays(dayNumber: number, f?: number): void {
-    let date;
-    if (f == null) {
-      f = this.month;
-    }
-    if (f + 1 < 12) {
-      date = new Date(this.year, f + 1, dayNumber + 1);
-    } else {
-      date = new Date(this.year, f + 1, dayNumber + 1);
-    }
-    this.dayClick.emit(date);
-  }
-
-  getWidthOfContainer(item: Item): string {
-    if (item.allDayItem) {
-      return 11.5 + '%';
-    } else {
-      const val = item.endDate.getDate() - item.startDate.getDate();
-      switch (val + 1) {
-        case 1:
-          return 11.5 + '%';
-        case 2:
-          return 24 + '%';
-        case 3:
-          return 38 + '%';
-        case 4:
-          return 51 + '%';
-        case 5:
-          return 65 + '%';
-        case 6:
-          return 78 + '%';
-        case 7:
-          return 91 + '%';
-      }
-    }
-  }
-
-  navToDirection(content: string): void {
-    if (content === '<') {
-      this.prev();
-    } else if (content === '>') {
-      this.next();
-    } else {
-      this.currentDay();
-    }
-  }
-
-  showViewInRightLang(view: string): string {
-    switch (view) {
-      case 'year':
-        return this.localeValue.others[0];
-      case 'month':
-        return this.localeValue.others[1];
-      case 'week':
-        return this.localeValue.others[2];
-      case 'day':
-        return this.localeValue.others[3];
-    }
-  }
-
-  getRightEvents(dayNumber: number, monthNum: number): Item[] {
-    const tempArray: Item[] = [];
-    const date = new Date(this.year, monthNum, dayNumber);
-    for (const item of this.events) {
-      if (date.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
-        tempArray.push(item);
-      }
-    }
-    return tempArray;
-  }
 }
 
 export interface Item {
@@ -497,6 +564,7 @@ export interface Item {
   allDayItem?: boolean | false;
   startDate: Date;
   endDate?: Date;
+  eventLenght?: number;
 }
 
 export interface List {

@@ -55,7 +55,11 @@
 }
 
 .border-grey {
-  border-color: #838282;
+  border-color: #8d8d8d !important;
+}
+
+.border-dg {
+  border-color: #3e3e3e !important;
 }
 
 .btn-dark {
@@ -90,4 +94,25 @@
 
 .gOnHover:hover{
   background-color: grey;
+}
+
+.todays-bg {
+  background-color: #d0d0f5;
+}
+
+.todays-bg-night {
+  background-color: #49494a;
+}
+
+.mx-n10 {
+  margin-left: -1rem !important;
+  margin-right: -1rem !important;
+}
+
+.ml-n10 {
+  margin-left: -1rem !important;
+}
+
+.max-width {
+  width: 999%;
 }

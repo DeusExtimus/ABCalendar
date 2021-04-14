@@ -6,17 +6,17 @@
       <div class="col-4 mt-3">
         <div class="btn-group" role="group">
           <button type="button"
-                  [ngClass]="{'btn btn-dark border rounded-start': theme == 'night',
+                  [ngClass]="{'btn btn-dark border border-grey rounded-start': theme == 'night',
                                 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
                   (click)="prev()"><span [ngClass]="{'lg': theme == 'night'}">{{'<'}}</span>
           </button>
           <button type="button"
-                  [ngClass]="{'btn btn-dark border': theme == 'night',
+                  [ngClass]="{'btn btn-dark border border-grey': theme == 'night',
                                 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
                   (click)="currentDay()"><span [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[4]}}</span>
           </button>
           <button type="button"
-                  [ngClass]="{'btn btn-dark border rounded-end': theme == 'night',
+                  [ngClass]="{'btn btn-dark border border-grey rounded-end': theme == 'night',
                                 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
                   (click)="next()"><span [ngClass]="{'lg': theme == 'night'}">{{'>'}}</span>
           </button>
@@ -30,23 +30,24 @@
       <div class="col-4 mt-3">
         <div class="btn-group" role="group">
           <button type="button"
-                  [ngClass]="{'btn btn-dark border rounded-start': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="setInitialView('year')">
+                  [ngClass]="{'btn btn-dark border border-grey rounded-start': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                  (click)="setInitialView('year')"
+                  *ngIf="yBtn">
             <span [ngClass]="{'lg': theme == 'night'}">{{showViewInRightLang('year')}}</span>
           </button>
           <button type="button"
-                  [ngClass]="{'btn btn-dark border': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="setInitialView('month')">
+                  [ngClass]="{'btn btn-dark border border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                  (click)="setInitialView('month')" *ngIf="mBtn">
             <span [ngClass]="{'lg': theme == 'night'}">{{showViewInRightLang('month')}}</span>
           </button>
           <button type="button"
-                  [ngClass]="{'btn btn-dark border': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="setInitialView('week')">
+                  [ngClass]="{'btn btn-dark border border-grey': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                  (click)="setInitialView('week')" *ngIf="wBtn">
             <span [ngClass]="{'lg': theme == 'night'}">{{showViewInRightLang('week')}}</span>
           </button>
           <button type="button"
-                  [ngClass]="{'btn btn-dark border rounded-end': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
-                  (click)="setInitialView('day')">
+                  [ngClass]="{'btn btn-dark border border-grey rounded-end': theme == 'night', 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                  (click)="setInitialView('day')" *ngIf="dBtn">
             <span [ngClass]="{'lg': theme == 'night'}">{{showViewInRightLang('day')}}</span>
           </button>
         </div>
@@ -74,19 +75,19 @@
               </div>
               <!--              DAYS OF PREV MONTH-->
               <div *ngFor="let beforeDay of numSequence(getEmptyStartDays(monthNum)); let ac = index;"
-                   class="border w-14 vh-9 lgOnHover" [ngClass]="{'gOnHover': theme == 'night'}">
+                   class="border w-14 vh-9 lgOnHover" [ngClass]="{'gOnHover border-dg': theme == 'night'}">
               </div>
               <!--              DAYS OF CURRENT MONTH-->
               <div *ngFor="let currentDay of numSequence(getDaysOfMonth(monthNum)); let dayNumber = index;"
                    class="border text-start w-14 vh-9 lgOnHover crop"
-                   [ngClass]="{'gOnHover': theme == 'night'}"
-                   [ngStyle]="{'background-color': colorOfTheDay(dayNumber, monthNum)}"
+                   [ngClass]="{'gOnHover border-dg': theme == 'night'}"
+                   [ngStyle]="{'background-color': colorOfTheDay(dayNumber + 1, monthNum)}"
                    (click)="emitDayClick(dayNumber, monthNum)">
                 <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
                   {{getNumbersInRightLang(dayNumber + 1)}}
                 </div>
                 <div class="row ms-0">
-                  <div *ngFor="let item of getRightEvents(dayNumber + 1, monthNum)" class="col-05 ps-0">
+                  <div *ngFor="let item of rightEvents(dayNumber + 1, monthNum)" class="col-05 ps-0">
                     <div class="dot crop pointer ms-0"
                          [ngClass]="{'border border-grey': theme == 'night'}"
                          [ngStyle]="{'background-color': getItemColor(item)}"
@@ -96,15 +97,15 @@
                 </div>
               </div>
               <!--              DAYS OF NEXT MONTH-->
-              <div *ngFor="let afterDay of numSequence(getEmptyEndDays(monthNum)); let daysOfNextMonth = index;"
+              <div *ngFor="let afterDay of daysOfNextMonth(monthNum); let daysOfNextMonth = index;"
                    class="border w-14 vh-9 lg lgOnHover text-start user-select-none"
                    (click)="emitDayClickAfterDays(daysOfNextMonth, monthNum)"
-                   [ngClass]="{'gOnHover dg': theme == 'night'}">
-                <div class="ms-0 user-select-none" [ngClass]="{'dg': theme == 'night'}">
+                   [ngClass]="{'gOnHover dg border-dg': theme == 'night'}">
+                <div class="ms-0 user-select-none">
                   {{daysOfNextMonth + 1}}
                 </div>
                 <div class="row ms-0">
-                  <div *ngFor="let item of getRightEvents(daysOfNextMonth + 1, monthNum + 1)" class="col-05 ps-0">
+                  <div *ngFor="let item of rightEvents(daysOfNextMonth + 1, monthNum + 1)" class="col-05 ps-0">
                     <div class="dot crop pointer ms-0"
                          [ngStyle]="{'background-color': getItemColor(item)}"
                          [ngClass]="{'border border-grey': theme == 'night'}"
@@ -123,51 +124,148 @@
     <div *ngIf="initialView == 'month'">
       <div class="row">
         <!--        WEEKDAYNAMES-->
-        <div class="row text-center mx-0 px-0" [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
+        <div class="row text-center mx-0 px-0"
+             [ngClass]="{ 'bg-dark': theme == 'dark',
+                          'bg-light': theme == 'light',
+                          'bg-dark border border-grey':  theme == 'night'}">
           <div *ngFor="let weekdayName of localeValue.weekdays" class="w-14 user-select-none">
-            <h5 [ngClass]="{'lg': theme == 'dark'}">{{weekdayName}}</h5>
+            <h5 [ngClass]="{'lg': theme == 'dark' || theme == 'night'}">{{weekdayName}}</h5>
           </div>
         </div>
         <!--        DAYS FOR PREV MONTH-->
         <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
-             class="border w-14 vh-15 lgOnHover crop user-select-none" [ngClass]="{'gOnHover': theme == 'night'}">
+             class="border w-14 vh-15 lgOnHover crop user-select-none"
+             [ngClass]="{'gOnHover border-dg': theme == 'night'}">
         </div>
         <!--        DAYS OF CURRENT MONTH-->
-        <div *ngFor="let currentday of numSequence(getDaysOfMonth()); let dayNumber = index"
-             class="border text-start w-14 vh-15 lgOnHover overflow-visible"
-             [ngStyle]="{'background-color': colorOfTheDay(dayNumber)}"
-             [ngClass]="{'gOnHover lg': theme == 'night'}"
-             (click)="emitDayClick(dayNumber)">
+        <div *ngFor="let currentday of monthDays()"
+             class="border text-start w-14 vh-15 lgOnHover overflow-hidden"
+             [ngStyle]="{'background-color': colorOfTheDay(currentday.getDate())}"
+             [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
+             (click)="emitDayClick(currentday.getDate())">
           <!--          DAYNUMBER-->
           <div class="ms-2 user-select-none">
-            {{getNumbersInRightLang(dayNumber + 1)}}
+            {{getNumbersInRightLang(currentday.getDate())}}
           </div>
           <!--          EVENT-->
-          <div *ngFor="let item of events">
-            <div *ngIf="correctDate(item, dayNumber)">
-              <div class="ms-1 crop rounded m-1 pointer" (click)="eventClick.emit(item)"
-                   [ngClass]="{'border border-grey': theme == 'night', 'border border-dark': theme == 'dark' || theme == 'light'}"
-                   [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item)), 'width': getWidthOfContainer(item)}">
+          <div *ngFor="let item of rightEvents(currentday.getDate())">
+            <!--            EVENT START-->
+            <div class="ms-1 crop rounded m-1 pointer"
+                 *ngIf="isStartDate(item, currentday.getDate()); else isEnd"
+                 (click)="eventClick.emit(item)"
+                 [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light',
+                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 }"
+                 [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+            >
+              <div class="ms-2">
                 {{item.title}}
               </div>
             </div>
+            <!--            EVENT ENDING-->
+            <ng-template #isEnd>
+              <div class="crop rounded m-1 pointer ml-n10"
+                   *ngIf="isEndDate(item, currentday.getDate()); else isNot"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
+            <!--EVENT MIDDLE-->
+            <ng-template #isNot>
+              <div class="crop rounded m-1 pointer mx-n10"
+                   *ngIf="!startDayIsEndDay(item);"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item)),
+                 'width': '999%'
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
           </div>
         </div>
         <!--        DAYS OF NEXT MONTH-->
-        <div *ngFor="let afterday of numSequence(getEmptyEndDays()); let daysOfNextMonth = index;"
-             class="border text-start w-14 vh-15 lg crop lgOnHover" [ngClass]="{'gOnHover dg': theme == 'night'}"
-             (click)="emitDayClickAfterDays(daysOfNextMonth)">
+        <div *ngFor="let afterday of daysOfNextMonth()"
+             class="border text-start w-14 vh-15 lg crop lgOnHover"
+             [ngClass]="{'gOnHover dg border-dg': theme == 'night'}"
+             (click)="emitDayClickAfterDays(afterday.getDate())">
           <div class="ms-2 user-select-none">
-            {{getNumbersInRightLang(daysOfNextMonth + 1)}}
+            {{getNumbersInRightLang(afterday.getDate())}}
           </div>
-          <div *ngFor="let item of events">
-            <div *ngIf="correctDate(item, daysOfNextMonth, month + 1)">
-              <div class="ms-1 crop rounded m-1 crop pointer" (click)="eventClick.emit(item)"
-                   [ngClass]="{'border border-grey': theme == 'night', 'border border-dark': theme == 'dark' || theme == 'light'}"
-                   [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
+          <div *ngFor="let item of rightEvents(afterday.getDate(), afterday.getMonth())">
+            <!--            EVENT START-->
+            <div class="ms-1 crop rounded m-1 pointer"
+                 *ngIf="isStartDate(item, afterday.getDate(), month + 1); else isEnd"
+                 (click)="eventClick.emit(item)"
+                 [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light',
+                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 }"
+                 [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+            >
+              <div class="ms-2">
                 {{item.title}}
               </div>
             </div>
+            <!--            EVENT ENDING-->
+            <ng-template #isEnd>
+              <div class="crop rounded m-1 pointer ml-n10"
+                   *ngIf="isEndDate(item, afterday.getDate(), afterday.getMonth()); else isNot"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
+            <!--EVENT MIDDLE-->
+            <ng-template #isNot>
+              <div class="crop rounded m-1 pointer mx-n10"
+                   *ngIf="!startDayIsEndDay(item);"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item)),
+                 'width': '999%'
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
           </div>
         </div>
       </div>
@@ -186,16 +284,66 @@
           </div>
         </div>
         <div class="row mx-0">
-          <div *ngFor="let counter of numSequence(7); let days = index"
+          <div *ngFor="let day of daysOfWeek()"
                class="w-14 border border-grey week-height crop lgOnHover"
                [ngClass]="{'gOnHover': theme == 'night'}"
-               [ngStyle]="{'background-color': colorOfTheDay(getDatesOfWeek(days))}">
-            <div *ngFor="let item of events">
-              <div *ngIf="correctDate(item, getDatesOfWeek(days))" class="m-1">
-                <div class="rounded w-100 border border-dark crop pointer" (click)="eventClick.emit(item)"
-                     [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
-                  {{item.title}}
+               [ngStyle]="{'background-color': colorOfTheDay(day.getDate(), day.getMonth())}">
+            <div *ngFor="let item of rightEvents(day.getDate(), day.getMonth())">
+              <div class="m-1">
+                <!--            EVENT START-->
+                <div class="ms-1 crop rounded m-1 pointer"
+                     *ngIf="isStartDate(item, day.getDate(), day.getMonth()); else isEnd"
+                     (click)="eventClick.emit(item)"
+                     [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light',
+                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 }"
+                     [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+                >
+                  <div class="ms-2">
+                    {{item.title}}
+                  </div>
                 </div>
+                <!--            EVENT ENDING-->
+                <ng-template #isEnd>
+                  <div class="crop rounded-end m-1 pointer ml-n10"
+                       *ngIf="isEndDate(item, day.getDate(), day.getMonth()); else isNot"
+                       (click)="eventClick.emit(item)"
+                       [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                       [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+                  >
+                    &nbsp;
+                  </div>
+                </ng-template>
+                <!--EVENT MIDDLE-->
+                <ng-template #isNot>
+                  <div class="crop m-1 pointer mx-n10"
+                       *ngIf="!startDayIsEndDay(item);"
+                       (click)="eventClick.emit(item)"
+                       [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                       [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item)),
+                 'width': '999%'
+                 }"
+                  >
+                    &nbsp;
+                  </div>
+                </ng-template>
+
               </div>
             </div>
           </div>
