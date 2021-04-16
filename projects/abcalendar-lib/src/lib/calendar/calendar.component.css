@@ -87,12 +87,22 @@
   display: inline-block;
 }
 
+.year-multi-day {
+  height: 9px;
+  width: 999%;
+}
+
+.year-multi-day-end {
+  height: 9px;
+  width: 130%;
+}
+
 .col-05 {
   flex: 0 0 auto;
   width: 3.3333333333%
 }
 
-.gOnHover:hover{
+.gOnHover:hover {
   background-color: grey;
 }
 
@@ -111,6 +121,10 @@
 
 .ml-n10 {
   margin-left: -1rem !important;
+}
+
+.mt-05 {
+  margin-top: .10rem !important
 }
 
 .max-width {

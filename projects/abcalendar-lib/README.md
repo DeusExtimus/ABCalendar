@@ -1,9 +1,12 @@
 # ABCalendar
 
 ## Note & Description
-**CURRENTLY ONLY ALL DAY EVENTS SUPPORTED**
-<br/>
 **SUPPORTS BOOTSTRAP 5**
+<br/>
+<br/>
+**CURRENTLY ONLY ALL-DAY-EVENTS SUPPORTED**
+<br/>
+**SUPPORTS MULTIDAY EVENTS SINCE 1.1.14**
 
 The ABCalender was programmed, because there is still no usable calendar with year view, which is easy to use and therefore ideal for beginners.
 Configurable values:

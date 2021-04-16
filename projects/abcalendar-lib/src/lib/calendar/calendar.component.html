@@ -78,38 +78,110 @@
                    class="border w-14 vh-9 lgOnHover" [ngClass]="{'gOnHover border-dg': theme == 'night'}">
               </div>
               <!--              DAYS OF CURRENT MONTH-->
-              <div *ngFor="let currentDay of numSequence(getDaysOfMonth(monthNum)); let dayNumber = index;"
+              <div *ngFor="let currentDay of monthDays(monthNum)"
                    class="border text-start w-14 vh-9 lgOnHover crop"
                    [ngClass]="{'gOnHover border-dg': theme == 'night'}"
-                   [ngStyle]="{'background-color': colorOfTheDay(dayNumber + 1, monthNum)}"
-                   (click)="emitDayClick(dayNumber, monthNum)">
+                   [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate(), monthNum)}"
+                   (click)="emitDayClick(currentDay.getDate(), monthNum)">
                 <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
-                  {{getNumbersInRightLang(dayNumber + 1)}}
+                  {{getNumbersInRightLang(currentDay.getDate())}}
+                </div>
+                <!--                  MULTIDAY-->
+                <div *ngFor="let item of rightMultiDayEvents(currentDay.getDate(), monthNum)" class="ps-0 mt-05">
+                  <!--                  STARTDAY-->
+                  <div
+                    *ngIf="isStartDate(item, currentDay.getDate(), monthNum), else isEnd">
+                    <div class="year-multi-day pointer rounded-start"
+                         [ngClass]="{'border border-grey': theme == 'night',
+                         'border border-dark': theme == 'light' || theme == 'dark'}"
+                         [ngStyle]="{'background-color': getItemColor(item)}"
+                         (click)="eventClick.emit(item)"></div>
+                  </div>
+                  <!--                  ENDDAY-->
+                  <ng-template #isEnd>
+                    <div *ngIf="isEndDate(item, currentDay.getDate(), monthNum), else isMiddle">
+                      <div class="year-multi-day-end pointer ml-n10 rounded-end"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
+                  <!--                  MIDDLE-->
+                  <ng-template #isMiddle>
+                    <div *ngIf="currentDay">
+                      <div class="year-multi-day pointer ml-n10"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
                 </div>
                 <div class="row ms-0">
-                  <div *ngFor="let item of rightEvents(dayNumber + 1, monthNum)" class="col-05 ps-0">
-                    <div class="dot crop pointer ms-0"
-                         [ngClass]="{'border border-grey': theme == 'night'}"
-                         [ngStyle]="{'background-color': getItemColor(item)}"
-                         (click)="eventClick.emit(item)">
+                  <!--                  SINGLEDAY-->
+                  <div *ngFor="let item of rightSingleDayEvents(currentDay.getDate(), monthNum)" class="col-05 ps-0">
+                    <div
+                      *ngIf="startDayIsEndDay(item) || item.allDayItem">
+                      <div class="dot crop pointer ms-0"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                                        'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
                     </div>
                   </div>
                 </div>
               </div>
               <!--              DAYS OF NEXT MONTH-->
-              <div *ngFor="let afterDay of daysOfNextMonth(monthNum); let daysOfNextMonth = index;"
-                   class="border w-14 vh-9 lg lgOnHover text-start user-select-none"
-                   (click)="emitDayClickAfterDays(daysOfNextMonth, monthNum)"
+              <div *ngFor="let afterDay of daysOfNextMonth(monthNum)"
+                   class="border w-14 vh-9 lg lgOnHover text-start user-select-none overflow-hidden"
+                   (click)="emitDayClickAfterDays(afterDay.getDate() - 1, monthNum)"
                    [ngClass]="{'gOnHover dg border-dg': theme == 'night'}">
                 <div class="ms-0 user-select-none">
-                  {{daysOfNextMonth + 1}}
+                  {{afterDay.getDate()}}
+                </div>
+                <!--                  MULTIDAY-->
+                <div *ngFor="let item of rightMultiDayEvents(afterDay.getDate(), monthNum + 1)" class="ps-0 mt-05">
+                  <!--                  STARTDAY-->
+                  <div
+                    *ngIf="isStartDate(item, afterDay.getDate(), monthNum + 1), else isEnd">
+                    <div class="year-multi-day pointer rounded-start"
+                         [ngClass]="{'border border-grey': theme == 'night',
+                         'border border-dark': theme == 'light' || theme == 'dark'}"
+                         [ngStyle]="{'background-color': getItemColor(item)}"
+                         (click)="eventClick.emit(item)"></div>
+                  </div>
+                  <!--                  ENDDAY-->
+                  <ng-template #isEnd>
+                    <div *ngIf="isEndDate(item, afterDay.getDate(), monthNum + 1), else isMiddle">
+                      <div class="year-multi-day-end pointer ml-n10 rounded-end"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
+                  <!--                  MIDDLE-->
+                  <ng-template #isMiddle>
+                    <div *ngIf="currentDay">
+                      <div class="year-multi-day pointer ml-n10"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
                 </div>
                 <div class="row ms-0">
-                  <div *ngFor="let item of rightEvents(daysOfNextMonth + 1, monthNum + 1)" class="col-05 ps-0">
-                    <div class="dot crop pointer ms-0"
-                         [ngStyle]="{'background-color': getItemColor(item)}"
-                         [ngClass]="{'border border-grey': theme == 'night'}"
-                         (click)="eventClick.emit(item)">
+                  <!--                  SINGLEDAY-->
+                  <div *ngFor="let item of rightSingleDayEvents(afterDay.getDate(), monthNum + 1)" class="col-05 ps-0">
+                    <div
+                      *ngIf="startDayIsEndDay(item) || item.allDayItem">
+                      <div class="dot crop pointer ms-0"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
                     </div>
                   </div>
                 </div>
@@ -304,7 +376,7 @@
                  'color': getTextColor(getItemColor(item))
                  }"
                 >
-                  <div class="ms-2">
+                  <div class="text-start ms-2">
                     {{item.title}}
                   </div>
                 </div>

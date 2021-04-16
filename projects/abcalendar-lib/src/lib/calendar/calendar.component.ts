@@ -421,6 +421,72 @@ export class CalendarComponent implements OnInit {
     }
   }
 
+  rightMultiDayEvents(dayNumber: number, monthNum: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
+    }
+    const date = new Date(this.year, monthNum, dayNumber);
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.allDayItem === false) {
+        let itemDay = new Date(item.startDate);
+        while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
+          if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
+            tempArray.push(item);
+          }
+          itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
+        }
+      }
+    }
+    // set eventLenght
+    for (const item of tempArray) {
+      if (!item.allDayItem) {
+        item.eventLenght = item.endDate.setHours(0, 0, 0, 0) - item.startDate.setHours(0, 0, 0, 0);
+      }
+    }
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
+  rightSingleDayEvents(dayNumber: number, monthNum: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
+    }
+
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.allDayItem !== false) {
+        item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
+        const newDate = new Date(this.year, monthNum, dayNumber);
+        if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
+          tempArray.push(item);
+        }
+      }
+    }
+
+    // set eventLenght
+    for (const item of tempArray) {
+      item.eventLenght = 1;
+    }
+
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
   isStartDate(item: Item, dayNumber: number, month?: number): boolean {
     if (month == null) {
       month = this.month;
@@ -553,7 +619,6 @@ export class CalendarComponent implements OnInit {
       this.theme = 'dark';
     }
   }
-
 }
 
 export interface Item {
