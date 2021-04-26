@@ -122,7 +122,7 @@
                   <!--                  SINGLEDAY-->
                   <div *ngFor="let item of rightSingleDayEvents(currentDay.getDate(), monthNum)" class="col-05 ps-0">
                     <div
-                      *ngIf="startDayIsEndDay(item) || item.allDayItem">
+                      *ngIf="startDayIsEndDay(item) || item.singleDay">
                       <div class="dot crop pointer ms-0"
                            [ngClass]="{'border border-grey': theme == 'night',
                                         'border border-dark': theme == 'light' || theme == 'dark'}"
@@ -176,7 +176,7 @@
                   <!--                  SINGLEDAY-->
                   <div *ngFor="let item of rightSingleDayEvents(afterDay.getDate(), monthNum + 1)" class="col-05 ps-0">
                     <div
-                      *ngIf="startDayIsEndDay(item) || item.allDayItem">
+                      *ngIf="startDayIsEndDay(item) || item.singleDay">
                       <div class="dot crop pointer ms-0"
                            [ngClass]="{'border border-grey': theme == 'night',
                            'border border-dark': theme == 'light' || theme == 'dark'}"
@@ -228,7 +228,7 @@
                  [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',
-                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 'max-width': item.startDate != item.endDate && !item.singleDay
                  }"
                  [ngStyle]="{
                  'background-color': getItemColor(item),
@@ -292,7 +292,7 @@
                  [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',
-                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 'max-width': item.startDate != item.endDate && !item.singleDay
                  }"
                  [ngStyle]="{
                  'background-color': getItemColor(item),
@@ -369,7 +369,7 @@
                      [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',
-                 'max-width': item.startDate != item.endDate && !item.allDayItem
+                 'max-width': item.startDate != item.endDate && !item.singleDay
                  }"
                      [ngStyle]="{
                  'background-color': getItemColor(item),
@@ -415,7 +415,6 @@
                     &nbsp;
                   </div>
                 </ng-template>
-
               </div>
             </div>
           </div>
@@ -437,8 +436,8 @@
             <div class="w-85">
               <div class="border border-grey min-height px-0 mx-0">
                 <div *ngFor="let item of events">
-                  <div *ngIf="isAllDayItem(item) && correctDate(item, day-1)">
-                    <div class="justify-content-center">
+                  <div *ngIf="isAllDayItem(item)">
+                    <div class="justify-content-center mx-1 mt-05">
                       <div class="rounded w-100 border border-dark crop pointer mb-05" (click)="eventClick.emit(item)"
                            [ngStyle]="{'background-color': getItemColor(item), 'color': getTextColor(getItemColor(item))}">
                         {{item.title}}
@@ -452,22 +451,48 @@
           <div class="h-2px"></div>
           <div *ngFor="let counter of numSequence(24); let hours = index; ">
             <div class="row">
+              <!--              TIME-->
               <div class="border border-grey w-14 h-50px"
                    [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
                 <div class="user-select-none" [ngClass]="{'lg': theme == 'dark' || theme == 'night'}">
                   {{getHoursOfDay(hours)}}
                 </div>
               </div>
+              <!--              CONTENT-->
               <div class="w-85">
-                <div class="border border-grey h-50"></div>
-                <div class="border border-grey h-50"></div>
+                <div class="border-top border-bottom border-grey force-h-50px overflow-hidden">
+                  <div class="row">
+                    <div *ngFor="let item of eventForHour(hours)" class="w-14">
+                      <div *ngIf="hours < item.startDate.getHours() || hours > item.endDate.getHours()">
+                      </div>
+                      <div [ngClass]="{
+                      'rounded-top force-h-50px': item.startDate.getHours() == hours,
+                      'rounded-bottom force-h-46px': item.endDate.getHours() == hours
+                      }"
+                           [ngStyle]="{'backgroundColor': item.color, 'color': getTextColor(getItemColor(item))}">
+                        <!--                        START-->
+                        <div *ngIf="item.startDate.getHours() == hours" class="mt-05">
+                          {{item.title}}
+                        </div>
+                        <!--                        MIDDLE-->
+                        <div *ngIf="hours != item.startDate.getHours() && hours != item.endDate.getHours()"
+                             class="user-select-none force-h-50px">
+                          &nbsp;
+                        </div>
+                        <!--                        END-->
+                        <div *ngIf="item.endDate.getHours() == hours" class="user-select-none">
+                          &nbsp;
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
   <div class="container h-50px"></div>
 </div>
