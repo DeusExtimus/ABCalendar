@@ -11,6 +11,7 @@ Configurable values:
 - Language or Object with LocalValue
 - Event input
 - Event output (on Click)
+- Event change (on Drop Event)
 - Date output (on Click)
 
 ## Setup a program with ABCalendar
@@ -198,6 +199,9 @@ Configurable values:
 ## Output Types
 
 (eventEmitter):
+* Item
+
+(eventChange):
 * Item
 
 (dateEmitter):
