@@ -210,20 +210,26 @@
              [ngClass]="{'gOnHover border-dg': theme == 'night'}">
         </div>
         <!--        DAYS OF CURRENT MONTH-->
-        <div *ngFor="let currentday of monthDays()"
-             class="border text-start w-14 vh-15 lgOnHover overflow-hidden"
-             [ngStyle]="{'background-color': colorOfTheDay(currentday.getDate())}"
+        <div *ngFor="let currentDay of monthDays()"
+             class="border text-start w-14 vh-15 lgOnHover overflow-hidden dropzone"
+             id="{{currentDay}}"
+             [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
-             (click)="emitDayClick(currentday.getDate())">
+             (dragenter)="setNewDate(currentDay); changeColor(currentDay)"
+             (click)="emitDayClick(currentDay.getDate())"
+        >
           <!--          DAYNUMBER-->
           <div class="ms-2 user-select-none">
-            {{getNumbersInRightLang(currentday.getDate())}}
+            {{getNumbersInRightLang(currentDay.getDate())}}
           </div>
           <!--          EVENT-->
-          <div *ngFor="let item of rightEvents(currentday.getDate())">
+          <div *ngFor="let item of rightEvents(currentDay.getDate())">
             <!--            EVENT START-->
             <div class="ms-1 crop rounded m-1 pointer"
-                 *ngIf="isStartDate(item, currentday.getDate()); else isEnd"
+                 draggable="true"
+                 id="{{item.title}}"
+                 (drag)="dragged = item"
+                 *ngIf="isStartDate(item, currentDay.getDate()); else isEnd"
                  (click)="eventClick.emit(item)"
                  [ngClass]="{
                  'border border-light': theme == 'night',
@@ -242,7 +248,7 @@
             <!--            EVENT ENDING-->
             <ng-template #isEnd>
               <div class="crop rounded m-1 pointer ml-n10"
-                   *ngIf="isEndDate(item, currentday.getDate()); else isNot"
+                   *ngIf="isEndDate(item, currentDay.getDate()); else isNot"
                    (click)="eventClick.emit(item)"
                    [ngClass]="{
                  'border border-light': theme == 'night',

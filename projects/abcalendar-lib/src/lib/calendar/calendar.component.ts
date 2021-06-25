@@ -1,11 +1,10 @@
 import {OnInit, Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-calendar',
+  selector: 'lib-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })
-
 export class CalendarComponent implements OnInit {
 
   @Input()
@@ -26,12 +25,17 @@ export class CalendarComponent implements OnInit {
   @Output()
   eventClick = new EventEmitter<Item>();
   @Output()
+  eventChange = new EventEmitter<Item>();
+  @Output()
   dayClick = new EventEmitter<Date>();
 
   today: Date = new Date(Date.now());
   year: number;
   month: number;
   day: number;
+
+  aValue: any;
+  dragged: Item;
 
   yBtn: boolean;
   mBtn: boolean;
@@ -78,6 +82,16 @@ export class CalendarComponent implements OnInit {
         '\nIssue-Board:' +
         '\nhttps://github.com/DeusExtimus/ABCalendar/issues');
       return ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'];
+    }
+  }
+
+  private static calendarLenght(item: Item, date: Date, tempArray: Item[]): void {
+    let itemDay = new Date(item.startDate);
+    while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
+      if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
+        tempArray.push(item);
+      }
+      itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
     }
   }
 
@@ -396,19 +410,9 @@ export class CalendarComponent implements OnInit {
     // get relevant Events
     for (const item of this.events) {
       if (item.singleDay === false) {
-        let itemDay = new Date(item.startDate);
-        while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
-          if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
-            tempArray.push(item);
-          }
-          itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
-        }
+        CalendarComponent.calendarLenght(item, date, tempArray);
       } else {
-        item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
-        const newDate = new Date(this.year, monthNum, dayNumber);
-        if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
-          tempArray.push(item);
-        }
+        this.pushSingleDayToArray(item, monthNum, dayNumber, tempArray);
       }
     }
 
@@ -440,13 +444,7 @@ export class CalendarComponent implements OnInit {
     // get relevant Events
     for (const item of this.events) {
       if (item.singleDay === false) {
-        let itemDay = new Date(item.startDate);
-        while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
-          if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
-            tempArray.push(item);
-          }
-          itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
-        }
+        CalendarComponent.calendarLenght(item, date, tempArray);
       }
     }
     // set eventLenght
@@ -474,11 +472,7 @@ export class CalendarComponent implements OnInit {
     // get relevant Events
     for (const item of this.events) {
       if (item.singleDay) {
-        item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
-        const newDate = new Date(this.year, monthNum, dayNumber);
-        if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
-          tempArray.push(item);
-        }
+        this.pushSingleDayToArray(item, monthNum, dayNumber, tempArray);
       }
     }
 
@@ -513,6 +507,58 @@ export class CalendarComponent implements OnInit {
 
   startDayIsEndDay(item: Item): boolean {
     return item.startDate === item.endDate;
+  }
+
+  eventForHour(hour: number): Item[] {
+    const tempArray: Item[] = [];
+    for (const item of this.events) {
+      if (!this.isAllDayItem(item) && this.correctDate(item, this.day - 1)) {
+        if (this.itemIsInTime(item, hour)) {
+          tempArray.push(item);
+        }
+      }
+    }
+    return tempArray;
+  }
+
+  eventIsStartEvent(event: Item, hours: number): boolean {
+    if (!this.isAllDayItem(event)) {
+      return event.startDate.getHours() === hours && event.startDate.getMinutes() < 30;
+    }
+  }
+
+  eventIsEndEvent(event: Item, hours: number): boolean {
+    if (!this.isAllDayItem(event)) {
+      console.log(event.endDate.getHours() === hours && event.endDate.getMinutes() < 30);
+      return event.endDate.getHours() === hours && event.endDate.getMinutes() < 30;
+    }
+  }
+
+  itemIsInTime(item: Item, hour: number): boolean {
+    let i = item.startDate.getHours();
+    let isTrue = false;
+    if (item.endDate != null) {
+      while (i <= item.endDate.getHours()) {
+        if (i === hour && this.day === item.startDate.getDate()) {
+          isTrue = true;
+          break;
+        }
+        i++;
+      }
+    }
+    return isTrue;
+  }
+
+  deleteTempValues(): void {
+    this.dragged = undefined;
+  }
+
+  private pushSingleDayToArray(item: Item, monthNum: number, dayNumber: number, tempArray: Item[]): void {
+    item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
+    const newDate = new Date(this.year, monthNum, dayNumber);
+    if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
+      tempArray.push(item);
+    }
   }
 
   private comperateEventLenght(): (a: any, b: any) => number {
@@ -628,48 +674,29 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  eventForHour(hour: number): Item[] {
-    const tempArray: Item[] = [];
-    for (const item of this.events) {
-      if (!this.isAllDayItem(item) && this.correctDate(item, this.day - 1)) {
-        if (this.itemIsInTime(item, hour)) {
-          tempArray.push(item);
+  setNewDate(currentDay: Date): void {
+    if (currentDay !== undefined && this.dragged !== undefined) {
+      this.dragged.startDate = currentDay;
+      for (const item of this.events) {
+        if (item.itemId === this.dragged.itemId) {
+          item.startDate = this.dragged.startDate;
+          this.eventChange.emit(item);
         }
       }
     }
-    return tempArray;
   }
 
-  eventIsStartEvent(event: Item, hours: number): boolean {
-    if (!this.isAllDayItem(event)) {
-      return event.startDate.getHours() === hours && event.startDate.getMinutes() < 30;
+  showMe($event?: DragEvent): void {
+    if ($event != null) {
+      console.log($event);
+    } else {
+      console.log('AAAABER');
     }
   }
 
-  eventIsEndEvent(event: Item, hours: number): boolean {
-    if (!this.isAllDayItem(event)) {
-      console.log(event.endDate.getHours() === hours && event.endDate.getMinutes() < 30);
-      return event.endDate.getHours() === hours && event.endDate.getMinutes() < 30;
-    }
-  }
-
-  itemIsInTime(item: Item, hour: number): boolean {
-    let i = item.startDate.getHours();
-    let isTrue = false;
-    if (item.endDate != null) {
-      while (i <= item.endDate.getHours()) {
-        if (i === hour && this.day === item.startDate.getDate()) {
-          isTrue = true;
-          break;
-        }
-        i++;
-      }
-    }
-    return isTrue;
-  }
-
-  writeInConsole(item: Item): void {
-    console.log(item);
+  changeColor(currentDay: Date): void {
+    const a = document.getElementById(currentDay.toString());
+    a.style.backgroundColor = '#000';
   }
 }
 

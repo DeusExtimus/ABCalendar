@@ -6,23 +6,25 @@ import { AppComponent } from './app.component';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {AbcalendarLibModule} from '../../projects/abcalendar-lib/src/lib/abcalendar-lib.module';
 
 @NgModule({
   declarations: [
     AppComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    })
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        AbcalendarLibModule
+    ],
   providers: [{provide: APP_INITIALIZER, useFactory: i18nFactory, deps: [TranslateService], multi: true}],
   bootstrap: [AppComponent]
 })

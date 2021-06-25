@@ -10,6 +10,6 @@ import {CommonModule} from '@angular/common';
   imports: [
     CommonModule
   ],
-  exports: [AbcalendarLibComponent]
+    exports: [AbcalendarLibComponent, CalendarComponent]
 })
 export class AbcalendarLibModule { }

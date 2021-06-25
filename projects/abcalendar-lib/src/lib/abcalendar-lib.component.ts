@@ -13,6 +13,7 @@ import {Item, Local} from './calendar/calendar.component';
       [language]="language"
       [theme]="theme"
       (eventClick)="setEvent($event)"
+      (eventChange)="changeEvent($event)"
       (dayClick)="setDay($event)"
     ></lib-calendar>
   `,
@@ -38,10 +39,16 @@ export class AbcalendarLibComponent {
   @Output()
   eventEmitter = new EventEmitter<Item>();
   @Output()
+  eventChanged = new EventEmitter<Item>();
+  @Output()
   dayEmitter = new EventEmitter<Date>();
 
   setEvent($event: Item): void {
     this.eventEmitter.emit($event);
+  }
+
+  changeEvent($event: Item): void {
+    this.eventChanged.emit($event);
   }
 
   setDay($event: Date): void {
