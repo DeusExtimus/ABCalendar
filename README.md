@@ -200,6 +200,9 @@ Configurable values:
 (eventEmitter):
 * Item
 
+(eventChange):
+* Item
+
 (dateEmitter):
 * Date
 
