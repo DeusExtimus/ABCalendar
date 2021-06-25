@@ -215,7 +215,7 @@
              id="{{currentDay}}"
              [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
-             (dragenter)="setNewDate(currentDay); changeColor(currentDay)"
+             (dragenter)="setNewDate(currentDay)"
              (click)="emitDayClick(currentDay.getDate())"
         >
           <!--          DAYNUMBER-->
@@ -293,7 +293,7 @@
           <div *ngFor="let item of rightEvents(afterday.getDate(), afterday.getMonth())">
             <!--            EVENT START-->
             <div class="ms-1 crop rounded m-1 pointer"
-                 *ngIf="isStartDate(item, afterday.getDate(), month + 1); else isEnd"
+                 *ngIf="isStartDate(item, afterday.getDate(), date.getMonth() + 1); else isEnd"
                  (click)="eventClick.emit(item)"
                  [ngClass]="{
                  'border border-light': theme == 'night',

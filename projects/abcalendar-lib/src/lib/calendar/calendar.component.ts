@@ -1,4 +1,4 @@
-import {OnInit, Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'lib-calendar',
@@ -30,11 +30,8 @@ export class CalendarComponent implements OnInit {
   dayClick = new EventEmitter<Date>();
 
   today: Date = new Date(Date.now());
-  year: number;
-  month: number;
-  day: number;
+  date: Date;
 
-  aValue: any;
   dragged: Item;
 
   yBtn: boolean;
@@ -115,19 +112,19 @@ export class CalendarComponent implements OnInit {
   getDaysOfMonth(f?: number): number {
     let firstDay: Date;
     if (f == null) {
-      firstDay = new Date(this.year, this.month + 1, 0);
+      firstDay = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0);
     } else {
-      firstDay = new Date(this.year, f + 1, 0);
+      firstDay = new Date(this.date.getFullYear(), f + 1, 0);
     }
     return firstDay.getDate();
   }
 
   monthDays(month?: number): Date[] {
     if (month == null) {
-      month = this.month;
+      month = this.date.getMonth();
     }
     const days: Date[] = [];
-    let startDate = new Date(this.year, month, 0);
+    let startDate = new Date(this.date.getFullYear(), month, 0);
     for (let i = 1; i <= this.getDaysOfMonth(month); i++) {
       days.push(startDate);
       startDate = new Date(startDate.setDate(startDate.getDate() + 1));
@@ -135,12 +132,12 @@ export class CalendarComponent implements OnInit {
     return days;
   }
 
-  getEmptyStartDays(f?: number): number {
-    let firstDay: Date;
-    if (f == null) {
-      firstDay = new Date(this.year, this.month, 1);
+  getEmptyStartDays(month?: number): number {
+    let firstDay;
+    if (month == null) {
+      firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1);
     } else {
-      firstDay = new Date(this.year, f, 1);
+      firstDay = new Date(this.date.getFullYear(), month, 1);
     }
     switch (firstDay.getDay()) {
       case 0:
@@ -162,10 +159,10 @@ export class CalendarComponent implements OnInit {
 
   daysOfNextMonth(month?: number): Date[] {
     if (month == null) {
-      month = this.month;
+      month = this.date.getMonth();
     }
     const days: Date[] = [];
-    let startDate = new Date(this.year, month + 1, 0);
+    let startDate = new Date(this.date.getFullYear(), month + 1, 0);
     const daysOfMonth = this.getDaysOfMonth(month);
     const emptyStartDays = this.getEmptyStartDays(month);
     for (let i = 1; i <= 42 - daysOfMonth - emptyStartDays; i++) {
@@ -177,102 +174,54 @@ export class CalendarComponent implements OnInit {
 
   prev(): void {
     if (this.initialView === 'year') {
-      this.year--;
+      this.date.setFullYear(this.date.getFullYear() - 1);
     } else if (this.initialView === 'month') {
-      if (this.month > 0) {
-        this.month--;
-      } else {
-        this.month = 11;
-        this.year--;
-      }
+      this.date.setMonth(this.date.getMonth() - 1);
     } else if (this.initialView === 'week') {
-      if (this.day - 7 < 0) {
-        this.day = this.getDaysOfMonth(this.month - 1) + (this.day - 7);
-        if (this.month === 0) {
-          this.month = 11;
-          this.year--;
-        } else {
-          this.month--;
-        }
-      } else {
-        this.day = this.day - 7;
-      }
+      this.date.setDate(this.date.getDate() - 7);
     } else {
-      if (this.day > 1) {
-        this.day--;
-      } else {
-        this.month--;
-        this.day = this.getDaysOfMonth(this.month);
-        if (this.month === 0) {
-          this.day = 31;
-          this.month = 11;
-          this.year--;
-        }
-      }
+      this.date.setDate(this.date.getDate() - 1);
     }
   }
 
   currentDay(): void {
-    this.year = this.today.getFullYear();
-    this.month = this.today.getMonth();
-    this.day = this.today.getDate();
+    this.date = new Date(Date.now());
   }
 
   next(): void {
     if (this.initialView === 'year') {
-      this.year++;
+      this.date.setFullYear(this.date.getFullYear() + 1);
     } else if (this.initialView === 'month') {
-      if (this.month < 11) {
-        this.month++;
-      } else {
-        this.month = 0;
-        this.year++;
-      }
+      this.date.setMonth(this.date.getMonth() + 1);
     } else if (this.initialView === 'week') {
-      if (this.day + 7 > this.getDaysOfMonth(this.month)) {
-        this.day = this.day + 7 - this.getDaysOfMonth(this.month);
-        if (this.month === 11) {
-          this.month = 0;
-          this.year++;
-        } else {
-          this.month++;
-        }
-      } else {
-        this.day = this.day + 7;
-      }
+      this.date.setDate(this.date.getDate() + 7);
     } else {
-      if (this.day < this.getDaysOfMonth(this.month) - 1) {
-        this.day++;
-      } else {
-        this.day = 1;
-        if (this.month < 11) {
-          this.month++;
-        } else {
-          this.month = 0;
-          this.year++;
-        }
-      }
+      this.date.setDate(this.date.getDate() + 1);
     }
   }
 
   setTitle(): string {
     switch (this.initialView) {
       case 'year':
-        return this.year.toString();
+        return this.date.getFullYear().toString();
       case 'month':
-        return `${this.localeValue.months[this.month]} ${this.year.toString()}`;
+        return `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
       case 'week':
         const wholeWeek = this.getWholeWeek();
-        const startDate = new Date(this.year, this.month, this.day - wholeWeek[0]);
-        const endDate = new Date(this.year, this.month, this.day + wholeWeek[1]);
+
+        const startDate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - wholeWeek[0]);
+        const endDate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + wholeWeek[1]);
+
         const formattedStartDate = CalendarComponent.setMonthAndDayFormat(startDate.getDate() + 1, startDate.getMonth() + 1);
         const formattedEndDate = CalendarComponent.setMonthAndDayFormat(endDate.getDate() + 1, endDate.getMonth() + 1);
+
         const startDay = `${formattedStartDate[0]}.${formattedStartDate[1]}`;
         const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${endDate.getFullYear()}`;
+
         return `${startDay} - ${endDay}`;
       case 'day':
-        const formattedDate = CalendarComponent.setMonthAndDayFormat(this.day, this.month + 1);
-        return `${formattedDate[0]}.${formattedDate[1]}.${this.year}`;
+        const formattedDate = CalendarComponent.setMonthAndDayFormat(this.date.getDate(), this.date.getMonth() + 1);
+        return `${formattedDate[0]}.${formattedDate[1]}.${this.date.getFullYear()}`;
     }
   }
 
@@ -294,9 +243,9 @@ export class CalendarComponent implements OnInit {
 
   correctDate(item: Item, day: number, month?: number): boolean {
     if (month == null) {
-      month = this.month;
+      month = this.date.getMonth();
     }
-    const dateToCheck = new Date(this.year, month, day + 1, 1, 0, 0, 0);
+    const dateToCheck = new Date(this.date.getFullYear(), month, day + 1, 1, 0, 0, 0);
     const itemDate = new Date(item.startDate);
     return itemDate.getFullYear() === dateToCheck.getFullYear() &&
       itemDate.getMonth() === dateToCheck.getMonth() &&
@@ -305,9 +254,9 @@ export class CalendarComponent implements OnInit {
 
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
     if (rightMonth == null) {
-      rightMonth = this.month;
+      rightMonth = this.date.getMonth();
     }
-    const compareableDate = new Date(this.year, rightMonth, dayNumber);
+    const compareableDate = new Date(this.date.getFullYear(), rightMonth, dayNumber);
     const comparisonDate = new Date(Date.now());
     if (compareableDate.setHours(0, 0, 0, 0) === comparisonDate.setHours(0, 0, 0, 0)) {
       if (this.theme !== 'night') {
@@ -328,7 +277,7 @@ export class CalendarComponent implements OnInit {
   }
 
   isAllDayItem(item: Item): boolean {
-    if (new Date(item.startDate).getDate() === this.day) {
+    if (new Date(item.startDate).getDate() === this.date.getDate()) {
       if (item.endDate != null) {
         return item.startDate.getHours() === item.endDate.getHours();
       } else {
@@ -340,7 +289,7 @@ export class CalendarComponent implements OnInit {
   }
 
   daysOfWeek(): Date[] {
-    const current = new Date(this.year, this.month, this.day);
+    const current = this.date;
     let startDate = new Date(current.setDate((current.getDate() - current.getDay())));
     const days: Date[] = [];
     for (let i = 1; i <= 7; i++) {
@@ -362,22 +311,17 @@ export class CalendarComponent implements OnInit {
 
   emitDayClick(dayNumber: number, f?: number): void {
     if (f == null) {
-      f = this.month;
+      f = this.date.getMonth();
     }
-    const date = new Date(this.year, f, dayNumber + 1);
+    const date = new Date(this.date.getFullYear(), f, dayNumber + 1);
     this.dayClick.emit(date);
   }
 
   emitDayClickAfterDays(dayNumber: number, f?: number): void {
-    let date;
     if (f == null) {
-      f = this.month;
+      f = this.date.getMonth();
     }
-    if (f + 1 < 12) {
-      date = new Date(this.year, f + 1, dayNumber + 1);
-    } else {
-      date = new Date(this.year, f + 1, dayNumber + 1);
-    }
+    const date = new Date(this.date.getFullYear(), f + 1, dayNumber + 1);
     this.dayClick.emit(date);
   }
 
@@ -402,10 +346,10 @@ export class CalendarComponent implements OnInit {
       return;
     }
     if (monthNum == null) {
-      monthNum = this.month;
+      monthNum = this.date.getMonth();
     }
 
-    const date = new Date(this.year, monthNum, dayNumber);
+    const date = new Date(this.date.getFullYear(), monthNum, dayNumber);
 
     // get relevant Events
     for (const item of this.events) {
@@ -440,7 +384,7 @@ export class CalendarComponent implements OnInit {
       console.log('NO EVENTS');
       return;
     }
-    const date = new Date(this.year, monthNum, dayNumber);
+    const date = new Date(this.date.getFullYear(), monthNum, dayNumber);
     // get relevant Events
     for (const item of this.events) {
       if (item.singleDay === false) {
@@ -491,17 +435,17 @@ export class CalendarComponent implements OnInit {
 
   isStartDate(item: Item, dayNumber: number, month?: number): boolean {
     if (month == null) {
-      month = this.month;
+      month = this.date.getMonth();
     }
-    const date = new Date(this.year, month, dayNumber);
+    const date = new Date(this.date.getFullYear(), month, dayNumber);
     return item.startDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
   }
 
   isEndDate(item: Item, dayNumber: number, month?: number): boolean {
     if (month == null) {
-      month = this.month;
+      month = this.date.getMonth();
     }
-    const date = new Date(this.year, month, dayNumber);
+    const date = new Date(this.date.getFullYear(), month, dayNumber);
     return item.endDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
   }
 
@@ -512,7 +456,7 @@ export class CalendarComponent implements OnInit {
   eventForHour(hour: number): Item[] {
     const tempArray: Item[] = [];
     for (const item of this.events) {
-      if (!this.isAllDayItem(item) && this.correctDate(item, this.day - 1)) {
+      if (!this.isAllDayItem(item) && this.correctDate(item, this.date.getDate() - 1)) {
         if (this.itemIsInTime(item, hour)) {
           tempArray.push(item);
         }
@@ -529,7 +473,6 @@ export class CalendarComponent implements OnInit {
 
   eventIsEndEvent(event: Item, hours: number): boolean {
     if (!this.isAllDayItem(event)) {
-      console.log(event.endDate.getHours() === hours && event.endDate.getMinutes() < 30);
       return event.endDate.getHours() === hours && event.endDate.getMinutes() < 30;
     }
   }
@@ -539,7 +482,7 @@ export class CalendarComponent implements OnInit {
     let isTrue = false;
     if (item.endDate != null) {
       while (i <= item.endDate.getHours()) {
-        if (i === hour && this.day === item.startDate.getDate()) {
+        if (i === hour && this.date.getDate() === item.startDate.getDate()) {
           isTrue = true;
           break;
         }
@@ -549,13 +492,9 @@ export class CalendarComponent implements OnInit {
     return isTrue;
   }
 
-  deleteTempValues(): void {
-    this.dragged = undefined;
-  }
-
   private pushSingleDayToArray(item: Item, monthNum: number, dayNumber: number, tempArray: Item[]): void {
     item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
-    const newDate = new Date(this.year, monthNum, dayNumber);
+    const newDate = new Date(this.date.getFullYear(), monthNum, dayNumber);
     if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
       tempArray.push(item);
     }
@@ -569,15 +508,7 @@ export class CalendarComponent implements OnInit {
   }
 
   private setInitialDate(): void {
-    let date: Date;
-    if (this.initialDate == null) {
-      date = new Date(Date.now());
-    } else {
-      date = this.initialDate;
-    }
-    this.year = date.getFullYear();
-    this.month = date.getMonth();
-    this.day = date.getDate();
+    this.date = this.initialDate || new Date(Date.now());
   }
 
   private checkEvents(): void {
@@ -597,7 +528,7 @@ export class CalendarComponent implements OnInit {
   }
 
   private getWholeWeek(): number[] {
-    switch (new Date(this.year, this.month, this.day + 1).getDay()) {
+    switch (new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 1).getDay()) {
       case 0:
         return [6, 0];
       case 1:
@@ -686,18 +617,6 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  showMe($event?: DragEvent): void {
-    if ($event != null) {
-      console.log($event);
-    } else {
-      console.log('AAAABER');
-    }
-  }
-
-  changeColor(currentDay: Date): void {
-    const a = document.getElementById(currentDay.toString());
-    a.style.backgroundColor = '#000';
-  }
 }
 
 export interface Item {
