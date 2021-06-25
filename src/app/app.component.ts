@@ -1,6 +1,4 @@
-import {Component, Injectable, Input, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
+import {Component, Injectable, Input, OnInit, Output, EventEmitter} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -11,34 +9,43 @@ import {TranslateService} from '@ngx-translate/core';
 @Injectable({providedIn: 'root'})
 export class AppComponent implements OnInit {
 
-  constructor(private router: Router,
-              private translate: TranslateService) {
+  constructor() {
   }
 
   @Input()
-  view: string;
+  initialView: string;
   @Input()
   initialDate: Date;
   @Input()
   events: Item[];
   @Input()
-  buttons: string[];
+  views: string[];
+  @Input()
+  localeValue: Local;
   @Input()
   language: string;
   @Input()
-  eventClick: string[];
+  theme: string;
+
+  @Output()
+  eventClick = new EventEmitter<Item>();
+  @Output()
+  eventChange = new EventEmitter<Item>();
+  @Output()
+  dayClick = new EventEmitter<Date>();
 
   today: Date = new Date(Date.now());
   year: number;
   month: number;
   day: number;
 
-  yBtn = false;
-  mBtn = false;
-  wBtn = false;
-  dBtn = false;
+  aValue: any;
+  dragged: Item;
 
-  itemCounter: number;
+  yBtn: boolean;
+  mBtn: boolean;
+  wBtn: boolean;
+  dBtn: boolean;
 
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
@@ -57,44 +64,80 @@ export class AppComponent implements OnInit {
     return monthAndDay;
   }
 
+  private static setOthers(language: string): string[] {
+    if (language.startsWith('en')) {
+      return ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'];
+    } else if (language.startsWith('de')) {
+      return ['Jahr', 'Monat', 'Woche', 'Tag', 'Heute', 'Ganztägig'];
+    } else if (language.startsWith('ru')) {
+      return ['Год', 'Месяц', 'Неделя', 'День', 'Сегодня', 'Весь день'];
+    } else if (language.startsWith('zh')) {
+      return ['年份', '月份', '周', '日', '今天', '全天'];
+    } else if (language.startsWith('es')) {
+      return ['Año', 'Mes', 'Semana', 'Día', 'Hoy', 'Todo el día'];
+    } else if (language.startsWith('it')) {
+      return ['Anno', 'Mese', 'Settimana', 'Giorno', 'Oggi', 'Tutto il giorno'];
+    } else if (language.startsWith('fr')) {
+      return ['Année', 'Mois', 'Semaine', 'Jour', 'Aujourd\'hui', 'Toute la journée'];
+    } else if (language.startsWith('ar')) {
+      return ['عام', 'شهر', 'أسبوع', 'يوم - نهار', 'اليوم', 'طوال اليوم'];
+    } else {
+      console.log('The language ' + language + ' is not implemented yet.' +
+        '\nPlease write an issue on the issue bord and watch out for updates.' +
+        '\nIssue-Board:' +
+        '\nhttps://github.com/DeusExtimus/ABCalendar/issues');
+      return ['Year', 'Month', 'Week', 'Day', 'Today', 'All Day'];
+    }
+  }
+
+  private static calendarLenght(item: Item, date: Date, tempArray: Item[]): void {
+    let itemDay = new Date(item.startDate);
+    while (itemDay.setHours(0, 0, 0, 0) <= item.endDate.setHours(0, 0, 0, 0)) {
+      if (itemDay.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)) {
+        tempArray.push(item);
+      }
+      itemDay = new Date(itemDay.setDate(itemDay.getDate() + 1));
+    }
+  }
+
   ngOnInit(): void {
     this.setInitialView();
     this.setInitialDate();
     this.checkEvents();
     this.prepareButtons();
-    this.setLanguage();
+    this.setLocaleForCalendar();
+    this.setTheme();
+  }
+
+  getNumbersInRightLang(num: number): string {
+    return num.toLocaleString(this.language);
   }
 
   numSequence(n: number): Array<number> {
     return Array(n);
   }
 
-  getMonthName(month: number): string {
-    const monthNames = [
-      this.translate.instant('MONTHS.JAN'),
-      this.translate.instant('MONTHS.FEB'),
-      this.translate.instant('MONTHS.MAR'),
-      this.translate.instant('MONTHS.APR'),
-      this.translate.instant('MONTHS.MAY'),
-      this.translate.instant('MONTHS.JUN'),
-      this.translate.instant('MONTHS.JUL'),
-      this.translate.instant('MONTHS.AUG'),
-      this.translate.instant('MONTHS.SEP'),
-      this.translate.instant('MONTHS.OCT'),
-      this.translate.instant('MONTHS.NOV'),
-      this.translate.instant('MONTHS.DEC')
-    ];
-    return monthNames[month];
-  }
-
   getDaysOfMonth(f?: number): number {
     let firstDay: Date;
     if (f == null) {
-      firstDay = new Date(this.year, this.month, 0);
+      firstDay = new Date(this.year, this.month + 1, 0);
     } else {
       firstDay = new Date(this.year, f + 1, 0);
     }
     return firstDay.getDate();
+  }
+
+  monthDays(month?: number): Date[] {
+    if (month == null) {
+      month = this.month;
+    }
+    const days: Date[] = [];
+    let startDate = new Date(this.year, month, 0);
+    for (let i = 1; i <= this.getDaysOfMonth(month); i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
   }
 
   getEmptyStartDays(f?: number): number {
@@ -122,23 +165,32 @@ export class AppComponent implements OnInit {
     }
   }
 
-  getEmptyEndDays(f?: number): number {
-    const daysOfMonth = this.getDaysOfMonth(f);
-    const getEmptyStartDay = this.getEmptyStartDays(f);
-    return 42 - daysOfMonth - getEmptyStartDay;
+  daysOfNextMonth(month?: number): Date[] {
+    if (month == null) {
+      month = this.month;
+    }
+    const days: Date[] = [];
+    let startDate = new Date(this.year, month + 1, 0);
+    const daysOfMonth = this.getDaysOfMonth(month);
+    const emptyStartDays = this.getEmptyStartDays(month);
+    for (let i = 1; i <= 42 - daysOfMonth - emptyStartDays; i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
   }
 
   prev(): void {
-    if (this.view === 'year') {
+    if (this.initialView === 'year') {
       this.year--;
-    } else if (this.view === 'month') {
+    } else if (this.initialView === 'month') {
       if (this.month > 0) {
         this.month--;
       } else {
         this.month = 11;
         this.year--;
       }
-    } else if (this.view === 'week') {
+    } else if (this.initialView === 'week') {
       if (this.day - 7 < 0) {
         this.day = this.getDaysOfMonth(this.month - 1) + (this.day - 7);
         if (this.month === 0) {
@@ -172,16 +224,16 @@ export class AppComponent implements OnInit {
   }
 
   next(): void {
-    if (this.view === 'year') {
+    if (this.initialView === 'year') {
       this.year++;
-    } else if (this.view === 'month') {
+    } else if (this.initialView === 'month') {
       if (this.month < 11) {
         this.month++;
       } else {
         this.month = 0;
         this.year++;
       }
-    } else if (this.view === 'week') {
+    } else if (this.initialView === 'week') {
       if (this.day + 7 > this.getDaysOfMonth(this.month)) {
         this.day = this.day + 7 - this.getDaysOfMonth(this.month);
         if (this.month === 11) {
@@ -208,31 +260,12 @@ export class AppComponent implements OnInit {
     }
   }
 
-  handleEvent(item: Item): void {
-    if (this.eventClick[0] === 'navigate') {
-      if (this.eventClick[2] != null) {
-        switch (this.eventClick[2]) {
-          case 'use id' :
-            this.router.navigateByUrl(`${this.eventClick[1]}/${item.itemId}`);
-            break;
-          case 'use title' :
-            this.router.navigateByUrl(`${this.eventClick[1]}/${item.title}`);
-            break;
-        }
-      } else {
-        this.router.navigateByUrl(this.eventClick[1]);
-      }
-    } else {
-      console.log('NO HANDLING');
-    }
-  }
-
   setTitle(): string {
-    switch (this.view) {
+    switch (this.initialView) {
       case 'year':
         return this.year.toString();
       case 'month':
-        return `${this.getMonthName(this.month)} ${this.year.toString()}`;
+        return `${this.localeValue.months[this.month]} ${this.year.toString()}`;
       case 'week':
         const wholeWeek = this.getWholeWeek();
         const startDate = new Date(this.year, this.month, this.day - wholeWeek[0]);
@@ -269,65 +302,275 @@ export class AppComponent implements OnInit {
       month = this.month;
     }
     const dateToCheck = new Date(this.year, month, day + 1, 1, 0, 0, 0);
-    const itemDate = new Date(item.dateOfExpiry);
-    const isCurrentDate =
-      itemDate.getFullYear() === dateToCheck.getFullYear() &&
+    const itemDate = new Date(item.startDate);
+    return itemDate.getFullYear() === dateToCheck.getFullYear() &&
       itemDate.getMonth() === dateToCheck.getMonth() &&
       dateToCheck.getDate() === itemDate.getDate();
-    if (isCurrentDate) {
-      this.itemCounter++;
-      return true;
+  }
+
+  colorOfTheDay(dayNumber: number, rightMonth?: number): string {
+    if (rightMonth == null) {
+      rightMonth = this.month;
+    }
+    const compareableDate = new Date(this.year, rightMonth, dayNumber);
+    const comparisonDate = new Date(Date.now());
+    if (compareableDate.setHours(0, 0, 0, 0) === comparisonDate.setHours(0, 0, 0, 0)) {
+      if (this.theme !== 'night') {
+        return '#d0d0f5';
+      } else {
+        return '#67676b';
+      }
+    }
+  }
+
+  getHoursOfDay(hours: number): string {
+    const num = 0;
+    if (hours >= 10) {
+      return hours.toLocaleString(this.language);
+    } else {
+      return `${num.toLocaleString(this.language)}${hours.toLocaleString(this.language)}`;
+    }
+  }
+
+  isAllDayItem(item: Item): boolean {
+    if (new Date(item.startDate).getDate() === this.day) {
+      if (item.endDate != null) {
+        return item.startDate.getHours() === item.endDate.getHours();
+      } else {
+        return true;
+      }
     } else {
       return false;
     }
   }
 
-  isToLate(): boolean {
-    return this.itemCounter <= 3;
+  daysOfWeek(): Date[] {
+    const current = new Date(this.year, this.month, this.day);
+    let startDate = new Date(current.setDate((current.getDate() - current.getDay())));
+    const days: Date[] = [];
+    for (let i = 1; i <= 7; i++) {
+      days.push(startDate);
+      startDate = new Date(startDate.setDate(startDate.getDate() + 1));
+    }
+    return days;
   }
 
-  goToItem(item: Item): void {
-    this.router.navigateByUrl(`application/private-list-items/${item.list.listId}`);
-  }
-
-  colorOfTheDay(dayNumber: number, rightMonth?: number): string {
-    let a;
-    if (rightMonth == null) {
-      a = Date.UTC(this.year, this.month, dayNumber + 1);
+  setInitialView(view?: string): void {
+    if (view == null) {
+      if (this.initialView == null) {
+        this.initialView = 'month';
+      }
     } else {
-      a = Date.UTC(this.year, rightMonth, dayNumber + 1);
-    }
-    const b = Date.UTC(this.year, this.month, this.today.getDate());
-    if (a === b) {
-      return '#ececf5';
+      this.initialView = view;
     }
   }
 
-  getHoursOfDay(hours: number): string {
-    if (hours >= 10) {
-      return hours.toString();
+  emitDayClick(dayNumber: number, f?: number): void {
+    if (f == null) {
+      f = this.month;
+    }
+    const date = new Date(this.year, f, dayNumber + 1);
+    this.dayClick.emit(date);
+  }
+
+  emitDayClickAfterDays(dayNumber: number, f?: number): void {
+    let date;
+    if (f == null) {
+      f = this.month;
+    }
+    if (f + 1 < 12) {
+      date = new Date(this.year, f + 1, dayNumber + 1);
     } else {
-      return `0${hours}`;
+      date = new Date(this.year, f + 1, dayNumber + 1);
+    }
+    this.dayClick.emit(date);
+  }
+
+  showViewInRightLang(view: string): string {
+    switch (view) {
+      case 'year':
+        return this.localeValue.others[0];
+      case 'month':
+        return this.localeValue.others[1];
+      case 'week':
+        return this.localeValue.others[2];
+      case 'day':
+        return this.localeValue.others[3];
     }
   }
 
-  isAllDayItem(item: Item): boolean {
-    return new Date(item.dateOfExpiry).getDate() === this.day;
-  }
-
-  getDatesOfWeek(indexDay: number): number {
-    const startDate = new Date(this.year, this.month, this.day - this.getWholeWeek()[0]);
-    return startDate.getDate() + indexDay;
-  }
-
-  resetCounter(): void {
-    this.itemCounter = 0;
-  }
-
-  private setInitialView(): void {
-    if (this.view == null) {
-      this.view = 'month';
+  rightEvents(dayNumber: number, monthNum?: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
     }
+    if (monthNum == null) {
+      monthNum = this.month;
+    }
+
+    const date = new Date(this.year, monthNum, dayNumber);
+
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.singleDay === false) {
+        AppComponent.calendarLenght(item, date, tempArray);
+      } else {
+        this.pushSingleDayToArray(item, monthNum, dayNumber, tempArray);
+      }
+    }
+
+    // set eventLenght
+    for (const item of tempArray) {
+      if (!item.singleDay) {
+        item.eventLenght = item.endDate.setHours(0, 0, 0, 0) - item.startDate.setHours(0, 0, 0, 0);
+      } else {
+        item.eventLenght = 1;
+      }
+    }
+
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
+  rightMultiDayEvents(dayNumber: number, monthNum: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
+    }
+    const date = new Date(this.year, monthNum, dayNumber);
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.singleDay === false) {
+        AppComponent.calendarLenght(item, date, tempArray);
+      }
+    }
+    // set eventLenght
+    for (const item of tempArray) {
+      if (!item.singleDay) {
+        item.eventLenght = item.endDate.setHours(0, 0, 0, 0) - item.startDate.setHours(0, 0, 0, 0);
+      }
+    }
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
+  rightSingleDayEvents(dayNumber: number, monthNum: number): Item[] {
+    const tempArray: Item[] = [];
+    // handle null values
+    if (this.events == null) {
+      console.log('NO EVENTS');
+      return;
+    }
+
+    // get relevant Events
+    for (const item of this.events) {
+      if (item.singleDay) {
+        this.pushSingleDayToArray(item, monthNum, dayNumber, tempArray);
+      }
+    }
+
+    // set eventLenght
+    for (const item of tempArray) {
+      item.eventLenght = 1;
+    }
+
+    // sorting
+    if (!tempArray || tempArray.length <= 1) {
+      return tempArray;
+    } else {
+      return [...tempArray].sort(this.comperateEventLenght());
+    }
+  }
+
+  isStartDate(item: Item, dayNumber: number, month?: number): boolean {
+    if (month == null) {
+      month = this.month;
+    }
+    const date = new Date(this.year, month, dayNumber);
+    return item.startDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+  }
+
+  isEndDate(item: Item, dayNumber: number, month?: number): boolean {
+    if (month == null) {
+      month = this.month;
+    }
+    const date = new Date(this.year, month, dayNumber);
+    return item.endDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+  }
+
+  startDayIsEndDay(item: Item): boolean {
+    return item.startDate === item.endDate;
+  }
+
+  eventForHour(hour: number): Item[] {
+    const tempArray: Item[] = [];
+    for (const item of this.events) {
+      if (!this.isAllDayItem(item) && this.correctDate(item, this.day - 1)) {
+        if (this.itemIsInTime(item, hour)) {
+          tempArray.push(item);
+        }
+      }
+    }
+    return tempArray;
+  }
+
+  eventIsStartEvent(event: Item, hours: number): boolean {
+    if (!this.isAllDayItem(event)) {
+      return event.startDate.getHours() === hours && event.startDate.getMinutes() < 30;
+    }
+  }
+
+  eventIsEndEvent(event: Item, hours: number): boolean {
+    if (!this.isAllDayItem(event)) {
+      console.log(event.endDate.getHours() === hours && event.endDate.getMinutes() < 30);
+      return event.endDate.getHours() === hours && event.endDate.getMinutes() < 30;
+    }
+  }
+
+  itemIsInTime(item: Item, hour: number): boolean {
+    let i = item.startDate.getHours();
+    let isTrue = false;
+    if (item.endDate != null) {
+      while (i <= item.endDate.getHours()) {
+        if (i === hour && this.day === item.startDate.getDate()) {
+          isTrue = true;
+          break;
+        }
+        i++;
+      }
+    }
+    return isTrue;
+  }
+
+  deleteTempValues(): void {
+    this.dragged = undefined;
+  }
+
+  private pushSingleDayToArray(item: Item, monthNum: number, dayNumber: number, tempArray: Item[]): void {
+    item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
+    const newDate = new Date(this.year, monthNum, dayNumber);
+    if (newDate.setHours(0, 0, 0, 0) === item.startDate.setHours(0, 0, 0, 0)) {
+      tempArray.push(item);
+    }
+  }
+
+  private comperateEventLenght(): (a: any, b: any) => number {
+    const property = 'eventLenght';
+    return (a, b) => {
+      return (a[property] - b[property]) * -1;
+    };
   }
 
   private setInitialDate(): void {
@@ -345,6 +588,16 @@ export class AppComponent implements OnInit {
   private checkEvents(): void {
     if (this.events === null) {
       console.log('NO EVENTS');
+    } else {
+      for (const event of this.events) {
+        if (event.singleDay == null) {
+          if (event.endDate == null) {
+            event.singleDay = true;
+          } else {
+            event.singleDay = event.startDate.setHours(0, 0, 0, 0) === event.endDate.setHours(0, 0, 0, 0);
+          }
+        }
+      }
     }
   }
 
@@ -368,12 +621,13 @@ export class AppComponent implements OnInit {
   }
 
   private prepareButtons(): void {
-    if (this.buttons == null) {
+    if (this.views == null) {
+      this.yBtn = true;
       this.mBtn = true;
       this.wBtn = true;
       this.dBtn = true;
     } else {
-      for (const btn of this.buttons) {
+      for (const btn of this.views) {
         switch (btn) {
           case 'year': {
             this.yBtn = true;
@@ -396,31 +650,81 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private setLanguage(): void {
-    if (this.language === 'de') {
-      this.translate.use('de');
-    } else {
-      this.translate.use('en');
+  private setLocaleForCalendar(): void {
+    const weekday: string[] = [];
+    const monthnames: string[] = [];
+    if (this.language == null) {
+      this.language = 'en-Us';
     }
+
+    for (let date = 1; date < 8; date++) {
+      const objDate = new Date(2021, 2, date);
+      weekday.push(objDate.toLocaleString(this.language, {weekday: 'short'}));
+    }
+    for (let month = 0; month < 12; month++) {
+      const objDate = new Date(2021, month, 1);
+      monthnames.push(objDate.toLocaleString(this.language, {month: 'long'}));
+    }
+
+    this.localeValue = {weekdays: weekday, months: monthnames, others: AppComponent.setOthers(this.language)};
+  }
+
+  private setTheme(): void {
+    if (this.theme === 'light' || this.theme === 'Light') {
+      this.theme = 'light';
+    } else if (this.theme === 'night' || this.theme === 'Night') {
+      this.theme = 'night';
+    } else {
+      this.theme = 'dark';
+    }
+  }
+
+  setNewDate(currentDay: Date): void {
+    if (currentDay !== undefined && this.dragged !== undefined) {
+      this.dragged.startDate = currentDay;
+      for (const item of this.events) {
+        if (item.itemId === this.dragged.itemId) {
+          item.startDate = this.dragged.startDate;
+          this.eventChange.emit(item);
+        }
+      }
+    }
+  }
+
+  showMe($event?: DragEvent): void {
+    if ($event != null) {
+      console.log($event);
+    } else {
+      console.log('AAAABER');
+    }
+  }
+
+  changeColor(currentDay: Date): void {
+    const a = document.getElementById(currentDay.toString());
+    a.style.backgroundColor = '#000';
   }
 }
 
-export class Item {
-
+export interface Item {
   itemId?: number;
   list?: List;
-  status?: number;
-  title?: string;
+  title: string;
   color?: string;
-  dateOfExpiry?: Date;
+  singleDay?: boolean;
+  startDate: Date;
+  endDate?: Date;
+  eventLenght?: number;
 }
 
-export class List {
-
+export interface List {
   listId?: number;
   item?: Item[];
   title?: string | undefined;
-  status?: number;
-  color?: string;
   dateOfExpiry?: Date;
+}
+
+export interface Local {
+  weekdays?: string[];
+  months?: string[];
+  others?: string[];
 }
