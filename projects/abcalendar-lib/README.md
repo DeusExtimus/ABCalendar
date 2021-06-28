@@ -157,6 +157,24 @@ Configurable values:
             this.router.navigateByUrl(`randomPageUrl/${$event.itemId}`);
         }
         ```
+      
+      * **usage of (eventChange)**
+          * in .html:
+          ```
+          (eventChange) = "changeItemDate($event)"
+          ```
+          *in .ts:
+          ```
+            changeItem($event: Item): void {
+              console.log($event);
+              for (const event of this.events) {
+                if (event.itemId === $event.itemId) {
+                  event.startDate = $event.startDate;
+                }
+              }
+            }
+          ```
+        
     * **usage of (dayEmitter):**
             * in .html:
             ```
