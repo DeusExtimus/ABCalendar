@@ -158,10 +158,10 @@ Configurable values:
         }
         ```
       
-      * **usage of (eventChange)**
+      * **usage of (eventChanged)**
           * in .html:
           ```
-          (eventChange) = "changeItemDate($event)"
+          (eventChanged) = "changeItemDate($event)"
           ```
           *in .ts:
           ```
