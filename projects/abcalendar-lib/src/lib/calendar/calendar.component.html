@@ -217,6 +217,7 @@
             <div class="ms-1 crop rounded m-1 pointer"
                  *ngIf="isStartDate(item, beforeday.getDate(), date.getMonth() - 1); else isEnd"
                  (click)="eventClick.emit(item)"
+                 (drag)="dragged = item"
                  [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',
