@@ -624,8 +624,8 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  setNewDate(currentDay: Date): void {
-    if (currentDay !== undefined && this.dragged !== undefined) {
+  setNewDate(currentDay: Date, e: any): void {
+    if (currentDay !== this.dragged.startDate && e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
       this.dragged.startDate = currentDay;
       for (const item of this.events) {
         if (item.itemId === this.dragged.itemId) {

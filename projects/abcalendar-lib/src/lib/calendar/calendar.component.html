@@ -207,7 +207,7 @@
         <!--        DAYS FOR PREV MONTH-->
         <div *ngFor="let beforeday of daysOfPrevMonth()"
              class="border text-start w-14 vh-15 lg crop lgOnHover"
-             (dragleave)="setNewDate(beforeday)"
+             (dragleave)="setNewDate(beforeday, $event)"
              [ngClass]="{'gOnHover border-dg': theme == 'night'}">
           <div class="ms-2 user-select-none">
             {{getNumbersInRightLang(beforeday.getDate())}}
@@ -217,7 +217,6 @@
             <div class="ms-1 crop rounded m-1 pointer"
                  *ngIf="isStartDate(item, beforeday.getDate(), date.getMonth() - 1); else isEnd"
                  (click)="eventClick.emit(item)"
-                 (drag)="dragged = item"
                  [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',
@@ -275,7 +274,7 @@
              id="{{currentDay}}"
              [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
-             (dragleave)="setNewDate(currentDay)"
+             (dragleave)="setNewDate(currentDay, $event)"
              (click)="emitDayClick(currentDay.getDate())"
         >
           <!--          DAYNUMBER-->
@@ -345,7 +344,7 @@
         <div *ngFor="let afterday of daysOfNextMonth()"
              class="border text-start w-14 vh-15 lg crop lgOnHover"
              [ngClass]="{'gOnHover dg border-dg': theme == 'night'}"
-             (dragleave)="setNewDate(afterday)"
+             (dragleave)="setNewDate(afterday, $event)"
              (click)="emitDayClickAfterDays(afterday.getDate())">
           <div class="ms-2 user-select-none">
             {{getNumbersInRightLang(afterday.getDate())}}
