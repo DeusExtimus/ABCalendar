@@ -13,6 +13,7 @@
           <button type="button"
                   [ngClass]="{'btn btn-dark border border-grey': theme == 'night',
                                 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
+                  (dragenter)="currentDay()"
                   (click)="currentDay()"><span [ngClass]="{'lg': theme == 'night'}">{{localeValue.others[4]}}</span>
           </button>
           <button type="button"
