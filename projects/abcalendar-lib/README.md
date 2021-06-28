@@ -176,16 +176,16 @@ Configurable values:
           ```
         
     * **usage of (dayEmitter):**
-            * in .html:
-            ```
-            (dayEmitter) = "getDate($event)"
-            ```
-            * in .ts:
-            ```
-            getDate($event): void {
-                console.log($event.getFullYear());
-            }
-            ```
+        * in .html:
+        ```
+        (dayEmitter) = "getDate($event)"
+        ```
+        * in .ts:
+        ```
+        getDate($event): void {
+            console.log($event.getFullYear());
+        }
+        ```
 ## Input types
 [views]: 
 * string[]
