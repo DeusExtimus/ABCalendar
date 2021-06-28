@@ -74,14 +74,67 @@
                 </div>
               </div>
               <!--              DAYS OF PREV MONTH-->
-              <div *ngFor="let beforeDay of numSequence(getEmptyStartDays(monthNum)); let ac = index;"
-                   class="border w-14 vh-9 lgOnHover" [ngClass]="{'gOnHover border-dg': theme == 'night'}">
+              <div *ngFor="let beforeDay of daysOfPrevMonth(monthNum)"
+                   class="border w-14 vh-9 lg lgOnHover text-start user-select-none overflow-hidden"
+                   (dragleave)="setNewDate(beforeDay, $event)"
+                   [ngClass]="{'gOnHover border-dg': theme == 'night'}">
+                <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
+                  {{getNumbersInRightLang(beforeDay.getDate())}}
+                </div>
+                <!--                  MULTIDAY-->
+                <div *ngFor="let item of rightMultiDayEvents(beforeDay.getDate(), monthNum - 1)" class="ps-0 mt-05">
+                  <!--                  STARTDAY-->
+                  <div
+                    *ngIf="isStartDate(item, beforeDay.getDate(), monthNum + 1), else isEnd">
+                    <div class="year-multi-day pointer rounded-start"
+                         [ngClass]="{'border border-grey': theme == 'night',
+                         'border border-dark': theme == 'light' || theme == 'dark'}"
+                         [ngStyle]="{'background-color': getItemColor(item)}"
+                         (click)="eventClick.emit(item)"></div>
+                  </div>
+                  <!--                  ENDDAY-->
+                  <ng-template #isEnd>
+                    <div *ngIf="isEndDate(item, beforeDay.getDate(), monthNum + 1), else isMiddle">
+                      <div class="year-multi-day-end pointer ml-n10 rounded-end"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
+                  <!--                  MIDDLE-->
+                  <ng-template #isMiddle>
+                    <div *ngIf="currentDay">
+                      <div class="year-multi-day pointer ml-n10"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </ng-template>
+                </div>
+                <div class="row ms-0">
+                  <!--                  SINGLEDAY-->
+                  <div *ngFor="let item of rightSingleDayEvents(beforeDay.getDate(), monthNum - 1)" class="col-05 ps-0">
+                    <div
+                      *ngIf="startDayIsEndDay(item) || item.singleDay">
+                      <div class="dot crop pointer ms-0"
+                           [draggable]="true"
+                           (drag)="dragged = item"
+                           [ngClass]="{'border border-grey': theme == 'night',
+                           'border border-dark': theme == 'light' || theme == 'dark'}"
+                           [ngStyle]="{'background-color': getItemColor(item)}"
+                           (click)="eventClick.emit(item)"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <!--              DAYS OF CURRENT MONTH-->
               <div *ngFor="let currentDay of monthDays(monthNum)"
                    class="border text-start w-14 vh-9 lgOnHover crop"
                    [ngClass]="{'gOnHover border-dg': theme == 'night'}"
                    [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate(), monthNum)}"
+                   (dragleave)="setNewDate(currentDay, $event)"
                    (click)="emitDayClick(currentDay.getDate(), monthNum)">
                 <div class="ms-0 user-select-none" [ngClass]="{'lg': theme == 'night'}">
                   {{getNumbersInRightLang(currentDay.getDate())}}
@@ -127,6 +180,8 @@
                            [ngClass]="{'border border-grey': theme == 'night',
                                         'border border-dark': theme == 'light' || theme == 'dark'}"
                            [ngStyle]="{'background-color': getItemColor(item)}"
+                           (drag)="dragged = item"
+                           [draggable]="true"
                            (click)="eventClick.emit(item)"></div>
                     </div>
                   </div>
@@ -136,6 +191,7 @@
               <div *ngFor="let afterDay of daysOfNextMonth(monthNum)"
                    class="border w-14 vh-9 lg lgOnHover text-start user-select-none overflow-hidden"
                    (click)="emitDayClickAfterDays(afterDay.getDate() - 1, monthNum)"
+                   (dragleave)="setNewDate(afterDay, $event)"
                    [ngClass]="{'gOnHover dg border-dg': theme == 'night'}">
                 <div class="ms-0 user-select-none">
                   {{afterDay.getDate()}}
@@ -178,6 +234,8 @@
                     <div
                       *ngIf="startDayIsEndDay(item) || item.singleDay">
                       <div class="dot crop pointer ms-0"
+                           [draggable]="true"
+                           (drag)="dragged = item"
                            [ngClass]="{'border border-grey': theme == 'night',
                            'border border-dark': theme == 'light' || theme == 'dark'}"
                            [ngStyle]="{'background-color': getItemColor(item)}"
@@ -425,6 +483,8 @@
         <div class="row mx-0">
           <div *ngFor="let day of daysOfWeek()"
                class="w-14 border border-grey week-height crop lgOnHover"
+               (dragleave)="setNewDate(day, $event)"
+               (click)="emitDayClick(day.getDate(), day.getMonth())"
                [ngClass]="{'gOnHover': theme == 'night'}"
                [ngStyle]="{'background-color': colorOfTheDay(day.getDate(), day.getMonth())}">
             <div *ngFor="let item of rightEvents(day.getDate(), day.getMonth())">
@@ -433,6 +493,8 @@
                 <div class="ms-1 crop rounded m-1 pointer"
                      *ngIf="isStartDate(item, day.getDate(), day.getMonth()); else isEnd"
                      (click)="eventClick.emit(item)"
+                     [draggable]="true"
+                     (drag)="dragged = item"
                      [ngClass]="{
                  'border border-light': theme == 'night',
                  'border border-dark': theme == 'dark' || theme == 'light',

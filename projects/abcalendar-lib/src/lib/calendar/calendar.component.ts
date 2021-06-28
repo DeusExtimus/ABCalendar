@@ -326,11 +326,11 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  emitDayClick(dayNumber: number, f?: number): void {
-    if (f == null) {
-      f = this.date.getMonth();
+  emitDayClick(dayNumber: number, month?: number): void {
+    if (month == null) {
+      month = this.date.getMonth();
     }
-    const date = new Date(this.date.getFullYear(), f, dayNumber + 1);
+    const date = new Date(this.date.getFullYear(), month, dayNumber);
     this.dayClick.emit(date);
   }
 
@@ -511,6 +511,18 @@ export class CalendarComponent implements OnInit {
     return isTrue;
   }
 
+  setNewDate(currentDay: Date, e: any): void {
+    if (currentDay !== this.dragged.startDate && e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
+      this.dragged.startDate = currentDay;
+      for (const item of this.events) {
+        if (item.itemId === this.dragged.itemId) {
+          item.startDate = this.dragged.startDate;
+          this.eventChange.emit(item);
+        }
+      }
+    }
+  }
+
   private pushSingleDayToArray(item: Item, monthNum: number, dayNumber: number, tempArray: Item[]): void {
     item.startDate = item.endDate = new Date(item.startDate.setHours(0, 0, 0, 0));
     const newDate = new Date(this.date.getFullYear(), monthNum, dayNumber);
@@ -621,18 +633,6 @@ export class CalendarComponent implements OnInit {
       this.theme = 'night';
     } else {
       this.theme = 'dark';
-    }
-  }
-
-  setNewDate(currentDay: Date, e: any): void {
-    if (currentDay !== this.dragged.startDate && e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
-      this.dragged.startDate = currentDay;
-      for (const item of this.events) {
-        if (item.itemId === this.dragged.itemId) {
-          item.startDate = this.dragged.startDate;
-          this.eventChange.emit(item);
-        }
-      }
     }
   }
 

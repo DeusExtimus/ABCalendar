@@ -154,3 +154,7 @@
 .h-max {
   height: 999px;
 }
+
+.cursorToMove {
+  cursor: copy;
+}
