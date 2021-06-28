@@ -205,9 +205,68 @@
           </div>
         </div>
         <!--        DAYS FOR PREV MONTH-->
-        <div *ngFor="let beforeday of numSequence(getEmptyStartDays()); let ac = index;"
-             class="border w-14 vh-15 lgOnHover crop user-select-none"
+        <div *ngFor="let beforeday of daysOfPrevMonth()"
+             class="border text-start w-14 vh-15 lg crop lgOnHover"
+             (dragleave)="setNewDate(beforeday)"
              [ngClass]="{'gOnHover border-dg': theme == 'night'}">
+          <div class="ms-2 user-select-none">
+            {{getNumbersInRightLang(beforeday.getDate())}}
+          </div>
+          <div *ngFor="let item of rightEvents(beforeday.getDate(), beforeday.getMonth())">
+            <!--            EVENT START-->
+            <div class="ms-1 crop rounded m-1 pointer"
+                 *ngIf="isStartDate(item, beforeday.getDate(), date.getMonth() - 1); else isEnd"
+                 (click)="eventClick.emit(item)"
+                 [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light',
+                 'max-width': item.startDate != item.endDate && !item.singleDay
+                 }"
+                 [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+            >
+              <div class="ms-2">
+                {{item.title}}
+              </div>
+            </div>
+            <!--            EVENT ENDING-->
+            <ng-template #isEnd>
+              <div class="crop rounded m-1 pointer ml-n10"
+                   *ngIf="isEndDate(item, beforeday.getDate(), beforeday.getMonth()); else isNot"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item))
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
+            <!--EVENT MIDDLE-->
+            <ng-template #isNot>
+              <div class="crop rounded m-1 pointer mx-n10"
+                   *ngIf="!startDayIsEndDay(item);"
+                   (click)="eventClick.emit(item)"
+                   [ngClass]="{
+                 'border border-light': theme == 'night',
+                 'border border-dark': theme == 'dark' || theme == 'light'
+                 }"
+                   [ngStyle]="{
+                 'background-color': getItemColor(item),
+                 'color': getTextColor(getItemColor(item)),
+                 'width': '999%'
+                 }"
+              >
+                &nbsp;
+              </div>
+            </ng-template>
+          </div>
         </div>
         <!--        DAYS OF CURRENT MONTH-->
         <div *ngFor="let currentDay of monthDays()"
@@ -215,7 +274,7 @@
              id="{{currentDay}}"
              [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
-             (dragenter)="setNewDate(currentDay)"
+             (dragleave)="setNewDate(currentDay)"
              (click)="emitDayClick(currentDay.getDate())"
         >
           <!--          DAYNUMBER-->
@@ -227,7 +286,6 @@
             <!--            EVENT START-->
             <div class="ms-1 crop rounded m-1 pointer"
                  draggable="true"
-                 id="{{item.title}}"
                  (drag)="dragged = item"
                  *ngIf="isStartDate(item, currentDay.getDate()); else isEnd"
                  (click)="eventClick.emit(item)"
@@ -286,6 +344,7 @@
         <div *ngFor="let afterday of daysOfNextMonth()"
              class="border text-start w-14 vh-15 lg crop lgOnHover"
              [ngClass]="{'gOnHover dg border-dg': theme == 'night'}"
+             (dragleave)="setNewDate(afterday)"
              (click)="emitDayClickAfterDays(afterday.getDate())">
           <div class="ms-2 user-select-none">
             {{getNumbersInRightLang(afterday.getDate())}}
@@ -294,6 +353,8 @@
             <!--            EVENT START-->
             <div class="ms-1 crop rounded m-1 pointer"
                  *ngIf="isStartDate(item, afterday.getDate(), date.getMonth() + 1); else isEnd"
+                 [draggable]="true"
+                 (drag)="dragged = item"
                  (click)="eventClick.emit(item)"
                  [ngClass]="{
                  'border border-light': theme == 'night',

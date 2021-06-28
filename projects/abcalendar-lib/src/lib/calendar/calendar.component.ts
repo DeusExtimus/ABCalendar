@@ -157,6 +157,23 @@ export class CalendarComponent implements OnInit {
     }
   }
 
+  daysOfPrevMonth(month?: number, year?: number): Date[] {
+    if (month == null) {
+      month = this.date.getMonth();
+    }
+    if (year == null) {
+      year = this.date.getFullYear();
+    }
+    const emptyStartDays = this.getEmptyStartDays(month);
+    const dateArray: Date[] = [];
+    for (let day = 1; day <= emptyStartDays; day++) {
+      const currentMonthsFirst = new Date(year, month, 1);
+      currentMonthsFirst.setDate(currentMonthsFirst.getDate() - day);
+      dateArray.push(currentMonthsFirst);
+    }
+    return [...dateArray].sort((a: Date, b: Date) => (a.getDate() - b.getDate()));
+  }
+
   daysOfNextMonth(month?: number): Date[] {
     if (month == null) {
       month = this.date.getMonth();
@@ -446,7 +463,9 @@ export class CalendarComponent implements OnInit {
       month = this.date.getMonth();
     }
     const date = new Date(this.date.getFullYear(), month, dayNumber);
-    return item.endDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+    if (item.startDate !== item.endDate) {
+      return item.endDate.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0);
+    }
   }
 
   startDayIsEndDay(item: Item): boolean {
