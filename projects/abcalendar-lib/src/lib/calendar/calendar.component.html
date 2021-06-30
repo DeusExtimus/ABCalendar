@@ -61,7 +61,7 @@
         <div class="border full-width" [ngClass]="{'bg-dark': theme == 'night'}">
           <div class="col-12 justify-content-center full-width no-padding">
             <!--            Monthnames-->
-            <div class="container-fluid text-center">
+            <div class="container-fluid text-center ">
               <h5 class="user-select-none" [ngClass]="{'lg': theme == 'night'}"
                   style="font-weight: bolder">{{localeValue.months[monthNum]}}</h5>
             </div>
@@ -472,7 +472,7 @@
     <!--WOCHENANSICHT-->
     <div *ngIf="initialView == 'week'">
       <div class="justify-content-center">
-        <div class="border border-light">
+        <div class="border border-light overflow-hidden">
           <div class="row text-center" [ngClass]="{'bg-dark': theme == 'dark', 'bg-light': theme == 'light'}">
             <div *ngFor="let weekdayName of localeValue.weekdays" class="user-select-none w-14">
               <h5 [ngClass]="{'lg': theme == 'dark' || theme == 'night'}">

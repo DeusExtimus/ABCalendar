@@ -164,7 +164,12 @@
   height: 100%;
 }
 
+.col-12 {
+  padding-left: -15px;
+  padding-right: -15px;
+}
+
 .no-padding {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: -15px;
+  padding-right: -15px;
 }
