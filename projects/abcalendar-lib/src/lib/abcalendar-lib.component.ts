@@ -15,6 +15,8 @@ import {Item, Local} from './calendar/calendar.component';
       (eventClick)="setEvent($event)"
       (eventChange)="changeEvent($event)"
       (dayClick)="setDay($event)"
+      (dateChange)="setDateChange($event)"
+      (viewChange)="setViewChange($event)"
     ></lib-calendar>
   `,
   styles: []
@@ -42,6 +44,10 @@ export class AbcalendarLibComponent {
   eventChanged = new EventEmitter<Item>();
   @Output()
   dayEmitter = new EventEmitter<Date>();
+  @Output()
+  dateChange = new EventEmitter<Date>();
+  @Output()
+  viewChange = new EventEmitter<string>();
 
   setEvent($event: Item): void {
     this.eventEmitter.emit($event);
@@ -53,5 +59,13 @@ export class AbcalendarLibComponent {
 
   setDay($event: Date): void {
     this.dayEmitter.emit($event);
+  }
+
+  setDateChange($event: Date): void {
+    this.dateChange.emit($event);
+  }
+
+  setViewChange($event: string): void {
+    this.viewChange.emit($event);
   }
 }

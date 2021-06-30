@@ -28,6 +28,10 @@ export class CalendarComponent implements OnInit {
   eventChange = new EventEmitter<Item>();
   @Output()
   dayClick = new EventEmitter<Date>();
+  @Output()
+  dateChange = new EventEmitter<Date>();
+  @Output()
+  viewChange = new EventEmitter<string>();
 
   today: Date = new Date(Date.now());
   date: Date;
@@ -199,10 +203,12 @@ export class CalendarComponent implements OnInit {
     } else {
       this.date.setDate(this.date.getDate() - 1);
     }
+    this.dateChange.emit(this.date);
   }
 
   currentDay(): void {
     this.date = new Date(Date.now());
+    this.dateChange.emit(this.date);
   }
 
   next(): void {
@@ -215,6 +221,7 @@ export class CalendarComponent implements OnInit {
     } else {
       this.date.setDate(this.date.getDate() + 1);
     }
+    this.dateChange.emit(this.date);
   }
 
   setTitle(): string {
@@ -224,17 +231,13 @@ export class CalendarComponent implements OnInit {
       case 'month':
         return `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
       case 'week':
-        const wholeWeek = this.getWholeWeek();
+        const wholeWeek = this.daysOfWeek();
 
-        const startDate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - wholeWeek[0]);
-        const endDate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + wholeWeek[1]);
-
-        const formattedStartDate = CalendarComponent.setMonthAndDayFormat(startDate.getDate() + 1, startDate.getMonth() + 1);
-        const formattedEndDate = CalendarComponent.setMonthAndDayFormat(endDate.getDate() + 1, endDate.getMonth() + 1);
+        const formattedStartDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[0].getDate(), wholeWeek[0].getMonth() + 1);
+        const formattedEndDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[6].getDate(), wholeWeek[6].getMonth() + 1);
 
         const startDay = `${formattedStartDate[0]}.${formattedStartDate[1]}`;
-        const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${endDate.getFullYear()}`;
-
+        const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${wholeWeek[6].getFullYear()}`;
         return `${startDay} - ${endDay}`;
       case 'day':
         const formattedDate = CalendarComponent.setMonthAndDayFormat(this.date.getDate(), this.date.getMonth() + 1);
@@ -262,7 +265,7 @@ export class CalendarComponent implements OnInit {
     if (month == null) {
       month = this.date.getMonth();
     }
-    const dateToCheck = new Date(this.date.getFullYear(), month, day + 1, 1, 0, 0, 0);
+    const dateToCheck = new Date(this.date.getFullYear(), month, day, 1, 0, 0, 0);
     const itemDate = new Date(item.startDate);
     return itemDate.getFullYear() === dateToCheck.getFullYear() &&
       itemDate.getMonth() === dateToCheck.getMonth() &&
@@ -306,8 +309,8 @@ export class CalendarComponent implements OnInit {
   }
 
   daysOfWeek(): Date[] {
-    const current = this.date;
-    let startDate = new Date(current.setDate((current.getDate() - current.getDay())));
+    let startDate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - this.date.getDay());
+    startDate.setDate(startDate.getDate());
     const days: Date[] = [];
     for (let i = 1; i <= 7; i++) {
       days.push(startDate);
@@ -324,6 +327,7 @@ export class CalendarComponent implements OnInit {
     } else {
       this.initialView = view;
     }
+    this.viewChange.emit(this.initialView);
   }
 
   emitDayClick(dayNumber: number, month?: number): void {
@@ -475,7 +479,7 @@ export class CalendarComponent implements OnInit {
   eventForHour(hour: number): Item[] {
     const tempArray: Item[] = [];
     for (const item of this.events) {
-      if (!this.isAllDayItem(item) && this.correctDate(item, this.date.getDate() - 1)) {
+      if (!this.isAllDayItem(item) && this.correctDate(item, this.date.getDate())) {
         if (this.itemIsInTime(item, hour)) {
           tempArray.push(item);
         }
@@ -555,25 +559,6 @@ export class CalendarComponent implements OnInit {
           }
         }
       }
-    }
-  }
-
-  private getWholeWeek(): number[] {
-    switch (new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 1).getDay()) {
-      case 0:
-        return [6, 0];
-      case 1:
-        return [0, 6];
-      case 2:
-        return [1, 5];
-      case 3:
-        return [2, 4];
-      case 4:
-        return [3, 3];
-      case 5:
-        return [4, 2];
-      case 6:
-        return [5, 1];
     }
   }
 

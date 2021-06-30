@@ -5,14 +5,18 @@
 
 The ABCalender was programmed, because there is still no usable calendar with year view, which is easy to use and therefore ideal for beginners.
 Configurable values:
-- View selection
 - Initial view
-- Start date
-- Language or Object with LocalValue
+- Initial Date
 - Event input
-- Event output (on Click)
-- Event change (on Drop Event)
-- Date output (on Click)
+- View selection (year/month/week/day)
+- Language or Object with LocalValue
+- Theme
+  
+- Event output (on Click (on Event))
+- Event change (on Drop Event (Drag'n'Drop))
+- Date output (on Click (on Date))
+- Date change (on Click (prev/today/next button))
+- View Change (on Click (year/month/week/day button))
 
 ## Setup a program with ABCalendar
 
@@ -186,6 +190,31 @@ Configurable values:
             console.log($event.getFullYear());
         }
         ```
+      
+    * **usage of (dateChange):**
+      * in .html:
+      ```
+      (dateChange) = "setNewDate($event)"
+      ```
+      * in .ts:
+      ```
+      setNewDate($event): void {
+          this.date = $event;
+      }
+      ```
+
+    * **usage of (viewChange):**
+      * in .html:
+        ```
+        (viewChange) = "writeNewViewToVariable($event)"
+        ```
+      * in .ts:
+        ```
+        writeNewViewToVariable($event): void {
+            this.view = $event;
+        }
+        ```
+        
 ## Input types
 [views]: 
 * string[]
@@ -224,6 +253,12 @@ Configurable values:
 
 (dateEmitter):
 * Date
+
+(dateChange):
+* Date
+
+(viewChange):
+* String
 
 ## Object Examples
 

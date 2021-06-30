@@ -59,7 +59,7 @@
     <div class="row col-12" *ngIf="initialView =='year'">
       <div *ngFor="let column of numSequence(12); let monthNum = index;" class="col-4 mt-3">
         <div class="border full-width" [ngClass]="{'bg-dark': theme == 'night'}">
-          <div class="col-12 justify-content-center full-width">
+          <div class="col-12 justify-content-center full-width no-padding">
             <!--            Monthnames-->
             <div class="container-fluid text-center">
               <h5 class="user-select-none" [ngClass]="{'lg': theme == 'night'}"
@@ -329,7 +329,7 @@
         </div>
         <!--        DAYS OF CURRENT MONTH-->
         <div *ngFor="let currentDay of monthDays()"
-             class="border text-start w-14 vh-15 lgOnHover overflow-hidden dropzone"
+             class="border text-start w-14 vh-15 lgOnHover overflow-hidden "
              id="{{currentDay}}"
              [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
