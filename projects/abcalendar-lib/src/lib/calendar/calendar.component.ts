@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, DoCheck, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'lib-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, DoCheck {
 
   @Input()
   initialView: string;
@@ -38,10 +38,13 @@ export class CalendarComponent implements OnInit {
 
   dragged: Item;
 
+  differ: KeyValueDiffer<string, any>;
+
   yBtn: boolean;
   mBtn: boolean;
   wBtn: boolean;
   dBtn: boolean;
+  title: string;
 
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
@@ -96,13 +99,29 @@ export class CalendarComponent implements OnInit {
     }
   }
 
+  constructor(private differs: KeyValueDiffers) {
+    this.differ = this.differs.find({}).create();
+  }
+
   ngOnInit(): void {
     this.setInitialView();
     this.setInitialDate();
+    this.setTitle();
     this.checkEvents();
     this.prepareButtons();
     this.setLocaleForCalendar();
     this.setTheme();
+  }
+
+  ngDoCheck(): void {
+    const change = this.differ.diff(this);
+    if (change) {
+      change.forEachChangedItem(item => {
+        if (item.key === 'initialView' || item.key === 'date') {
+          this.setTitle();
+        }
+      });
+    }
   }
 
   getNumbersInRightLang(num: number): string {
@@ -195,13 +214,13 @@ export class CalendarComponent implements OnInit {
 
   prev(): void {
     if (this.initialView === 'year') {
-      this.date.setFullYear(this.date.getFullYear() - 1);
+      this.date = new Date(this.date.getFullYear() - 1, this.date.getMonth(), this.date.getDate());
     } else if (this.initialView === 'month') {
-      this.date.setMonth(this.date.getMonth() - 1);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth() - 1, this.date.getDate());
     } else if (this.initialView === 'week') {
-      this.date.setDate(this.date.getDate() - 7);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - 7);
     } else {
-      this.date.setDate(this.date.getDate() - 1);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - 1);
     }
     this.dateChange.emit(this.date);
   }
@@ -213,23 +232,25 @@ export class CalendarComponent implements OnInit {
 
   next(): void {
     if (this.initialView === 'year') {
-      this.date.setFullYear(this.date.getFullYear() + 1);
+      this.date = new Date(this.date.getFullYear() + 1, this.date.getMonth(), this.date.getDate());
     } else if (this.initialView === 'month') {
-      this.date.setMonth(this.date.getMonth() + 1);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
     } else if (this.initialView === 'week') {
-      this.date.setDate(this.date.getDate() + 7);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 7);
     } else {
-      this.date.setDate(this.date.getDate() + 1);
+      this.date = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 1);
     }
     this.dateChange.emit(this.date);
   }
 
-  setTitle(): string {
+  setTitle(): void {
     switch (this.initialView) {
       case 'year':
-        return this.date.getFullYear().toString();
+        this.title = this.date.getFullYear().toString();
+        break;
       case 'month':
-        return `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
+        this.title = `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
+        break;
       case 'week':
         const wholeWeek = this.daysOfWeek();
 
@@ -238,10 +259,12 @@ export class CalendarComponent implements OnInit {
 
         const startDay = `${formattedStartDate[0]}.${formattedStartDate[1]}`;
         const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${wholeWeek[6].getFullYear()}`;
-        return `${startDay} - ${endDay}`;
+        this.title = `${startDay} - ${endDay}`;
+        break;
       case 'day':
         const formattedDate = CalendarComponent.setMonthAndDayFormat(this.date.getDate(), this.date.getMonth() + 1);
-        return `${formattedDate[0]}.${formattedDate[1]}.${this.date.getFullYear()}`;
+        this.title = `${formattedDate[0]}.${formattedDate[1]}.${this.date.getFullYear()}`;
+        break;
     }
   }
 
@@ -620,7 +643,6 @@ export class CalendarComponent implements OnInit {
       this.theme = 'dark';
     }
   }
-
 }
 
 export interface Item {

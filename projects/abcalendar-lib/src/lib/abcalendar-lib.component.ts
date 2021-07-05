@@ -5,13 +5,13 @@ import {Item, Local} from './calendar/calendar.component';
   selector: 'lib-abcalendar-lib',
   template: `
     <lib-calendar
-      [views]="views"
-      [initialView]="initialView"
-      [initialDate]="initialDate"
-      [events]="events"
-      [localeValue]="localeValue"
-      [language]="language"
-      [theme]="theme"
+      [views]="abConfig.views"
+      [initialView]="abConfig.initialView"
+      [initialDate]="abConfig.initialDate"
+      [events]="abConfig.events"
+      [localeValue]="abConfig.localeValue"
+      [language]="abConfig.language"
+      [theme]="abConfig.theme"
       (eventClick)="setEvent($event)"
       (eventChange)="changeEvent($event)"
       (dayClick)="setDay($event)"
@@ -24,20 +24,22 @@ import {Item, Local} from './calendar/calendar.component';
 export class AbcalendarLibComponent {
 
   @Input()
-  initialView: string;
-  @Input()
-  initialDate: Date;
-  @Input()
-  events: Item[];
-  @Input()
-  views: string[];
-  @Input()
-  localeValue: Local;
-  @Input()
-  language: string;
-  @Input()
-  theme: string;
+  abConfig: AbConfig;
 
+  // @Input()
+  // initialView: string;
+  // @Input()
+  // initialDate: Date;
+  // @Input()
+  // events: Item[];
+  // @Input()
+  // views: string[];
+  // @Input()
+  // localeValue: Local;
+  // @Input()
+  // language: string;
+  // @Input()
+  // theme: string;
   @Output()
   eventEmitter = new EventEmitter<Item>();
   @Output()
@@ -68,4 +70,14 @@ export class AbcalendarLibComponent {
   setViewChange($event: string): void {
     this.viewChange.emit($event);
   }
+}
+
+export interface AbConfig {
+  initialView?: string;
+  initialDate?: Date;
+  events?: Item[];
+  views?: string[];
+  localeValue?: Local;
+  language?: string;
+  theme?: string;
 }
