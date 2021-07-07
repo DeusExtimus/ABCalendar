@@ -21,6 +21,8 @@ export class CalendarComponent implements OnInit, DoCheck {
   language: string;
   @Input()
   theme: string;
+  @Input()
+  useTitle: boolean;
 
   @Output()
   eventClick = new EventEmitter<Item>();
@@ -45,6 +47,10 @@ export class CalendarComponent implements OnInit, DoCheck {
   wBtn: boolean;
   dBtn: boolean;
   title: string;
+
+  constructor(private differs: KeyValueDiffers) {
+    this.differ = this.differs.find({}).create();
+  }
 
   private static setMonthAndDayFormat(day: number, month: number): string[] {
     const monthAndDay: string[] = [' ', ' '];
@@ -99,18 +105,15 @@ export class CalendarComponent implements OnInit, DoCheck {
     }
   }
 
-  constructor(private differs: KeyValueDiffers) {
-    this.differ = this.differs.find({}).create();
-  }
-
   ngOnInit(): void {
     this.setInitialView();
     this.setInitialDate();
-    this.setTitle();
     this.checkEvents();
     this.prepareButtons();
     this.setLocaleForCalendar();
     this.setTheme();
+    this.setTitle();
+    this.setTitleUsage();
   }
 
   ngDoCheck(): void {
@@ -124,22 +127,12 @@ export class CalendarComponent implements OnInit, DoCheck {
     }
   }
 
-  getNumbersInRightLang(num: number): string {
+  getNumberInRightLang(num: number): string {
     return num.toLocaleString(this.language);
   }
 
   numSequence(n: number): Array<number> {
     return Array(n);
-  }
-
-  getDaysOfMonth(f?: number): number {
-    let firstDay: Date;
-    if (f == null) {
-      firstDay = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0);
-    } else {
-      firstDay = new Date(this.date.getFullYear(), f + 1, 0);
-    }
-    return firstDay.getDate();
   }
 
   monthDays(month?: number): Date[] {
@@ -153,31 +146,6 @@ export class CalendarComponent implements OnInit, DoCheck {
       startDate = new Date(startDate.setDate(startDate.getDate() + 1));
     }
     return days;
-  }
-
-  getEmptyStartDays(month?: number): number {
-    let firstDay;
-    if (month == null) {
-      firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1);
-    } else {
-      firstDay = new Date(this.date.getFullYear(), month, 1);
-    }
-    switch (firstDay.getDay()) {
-      case 0:
-        return 6;
-      case 1:
-        return 0;
-      case 2:
-        return 1;
-      case 3:
-        return 2;
-      case 4:
-        return 3;
-      case 5:
-        return 4;
-      case 6:
-        return 5;
-    }
   }
 
   daysOfPrevMonth(month?: number, year?: number): Date[] {
@@ -243,31 +211,6 @@ export class CalendarComponent implements OnInit, DoCheck {
     this.dateChange.emit(this.date);
   }
 
-  setTitle(): void {
-    switch (this.initialView) {
-      case 'year':
-        this.title = this.date.getFullYear().toString();
-        break;
-      case 'month':
-        this.title = `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
-        break;
-      case 'week':
-        const wholeWeek = this.daysOfWeek();
-
-        const formattedStartDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[0].getDate(), wholeWeek[0].getMonth() + 1);
-        const formattedEndDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[6].getDate(), wholeWeek[6].getMonth() + 1);
-
-        const startDay = `${formattedStartDate[0]}.${formattedStartDate[1]}`;
-        const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${wholeWeek[6].getFullYear()}`;
-        this.title = `${startDay} - ${endDay}`;
-        break;
-      case 'day':
-        const formattedDate = CalendarComponent.setMonthAndDayFormat(this.date.getDate(), this.date.getMonth() + 1);
-        this.title = `${formattedDate[0]}.${formattedDate[1]}.${this.date.getFullYear()}`;
-        break;
-    }
-  }
-
   getItemColor(item: Item): string {
     if (item.color == null || !item.color.match(/^#([0-9a-f]{3}){1,2}$/i)) {
       return '#e7e2e2';
@@ -282,17 +225,6 @@ export class CalendarComponent implements OnInit, DoCheck {
     const b = parseInt(backgroundColor.substring(5, 7), 16);
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
-  }
-
-  correctDate(item: Item, day: number, month?: number): boolean {
-    if (month == null) {
-      month = this.date.getMonth();
-    }
-    const dateToCheck = new Date(this.date.getFullYear(), month, day, 1, 0, 0, 0);
-    const itemDate = new Date(item.startDate);
-    return itemDate.getFullYear() === dateToCheck.getFullYear() &&
-      itemDate.getMonth() === dateToCheck.getMonth() &&
-      dateToCheck.getDate() === itemDate.getDate();
   }
 
   colorOfTheDay(dayNumber: number, rightMonth?: number): string {
@@ -511,19 +443,30 @@ export class CalendarComponent implements OnInit, DoCheck {
     return tempArray;
   }
 
-  eventIsStartEvent(event: Item, hours: number): boolean {
-    if (!this.isAllDayItem(event)) {
-      return event.startDate.getHours() === hours && event.startDate.getMinutes() < 30;
+  setNewDate(currentDay: Date, e: any): void {
+    if (currentDay !== this.dragged.startDate && e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
+      this.dragged.startDate = currentDay;
+      for (const item of this.events) {
+        if (item.itemId === this.dragged.itemId) {
+          item.startDate = this.dragged.startDate;
+          this.eventChange.emit(item);
+        }
+      }
     }
   }
 
-  eventIsEndEvent(event: Item, hours: number): boolean {
-    if (!this.isAllDayItem(event)) {
-      return event.endDate.getHours() === hours && event.endDate.getMinutes() < 30;
+  private correctDate(item: Item, day: number, month?: number): boolean {
+    if (month == null) {
+      month = this.date.getMonth();
     }
+    const dateToCheck = new Date(this.date.getFullYear(), month, day, 1, 0, 0, 0);
+    const itemDate = new Date(item.startDate);
+    return itemDate.getFullYear() === dateToCheck.getFullYear() &&
+      itemDate.getMonth() === dateToCheck.getMonth() &&
+      dateToCheck.getDate() === itemDate.getDate();
   }
 
-  itemIsInTime(item: Item, hour: number): boolean {
+  private itemIsInTime(item: Item, hour: number): boolean {
     let i = item.startDate.getHours();
     let isTrue = false;
     if (item.endDate != null) {
@@ -536,18 +479,6 @@ export class CalendarComponent implements OnInit, DoCheck {
       }
     }
     return isTrue;
-  }
-
-  setNewDate(currentDay: Date, e: any): void {
-    if (currentDay !== this.dragged.startDate && e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
-      this.dragged.startDate = currentDay;
-      for (const item of this.events) {
-        if (item.itemId === this.dragged.itemId) {
-          item.startDate = this.dragged.startDate;
-          this.eventChange.emit(item);
-        }
-      }
-    }
   }
 
   private pushSingleDayToArray(item: Item, monthNum: number, dayNumber: number, tempArray: Item[]): void {
@@ -563,6 +494,31 @@ export class CalendarComponent implements OnInit, DoCheck {
     return (a, b) => {
       return (a[property] - b[property]) * -1;
     };
+  }
+
+  private setTitle(): void {
+    switch (this.initialView) {
+      case 'year':
+        this.title = this.date.getFullYear().toString();
+        break;
+      case 'month':
+        this.title = `${this.localeValue.months[this.date.getMonth()]} ${this.date.getFullYear().toString()}`;
+        break;
+      case 'week':
+        const wholeWeek = this.daysOfWeek();
+
+        const formattedStartDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[0].getDate(), wholeWeek[0].getMonth() + 1);
+        const formattedEndDate = CalendarComponent.setMonthAndDayFormat(wholeWeek[6].getDate(), wholeWeek[6].getMonth() + 1);
+
+        const startDay = `${formattedStartDate[0]}.${formattedStartDate[1]}`;
+        const endDay = `${formattedEndDate[0]}.${formattedEndDate[1]}.${wholeWeek[6].getFullYear()}`;
+        this.title = `${startDay} - ${endDay}`;
+        break;
+      case 'day':
+        const formattedDate = CalendarComponent.setMonthAndDayFormat(this.date.getDate(), this.date.getMonth() + 1);
+        this.title = `${formattedDate[0]}.${formattedDate[1]}.${this.date.getFullYear()}`;
+        break;
+    }
   }
 
   private setInitialDate(): void {
@@ -586,33 +542,58 @@ export class CalendarComponent implements OnInit, DoCheck {
   }
 
   private prepareButtons(): void {
+    const tempArray = [];
     if (this.views == null) {
-      this.yBtn = true;
-      this.mBtn = true;
-      this.wBtn = true;
-      this.dBtn = true;
+      this.setAllButtonsTrue();
     } else {
+      if (this.views.length > 4) {
+        console.error(`View Lenght [${this.views.length}] is to long. Maximal 4 views allowed.`);
+        this.setAllButtonsTrue();
+      }
       for (const btn of this.views) {
+        const tempObj = {id: 5, view: btn};
         switch (btn) {
           case 'year': {
             this.yBtn = true;
+            tempObj.id = 1;
             break;
           }
           case 'month': {
             this.mBtn = true;
+            tempObj.id = 2;
             break;
           }
           case 'week': {
             this.wBtn = true;
+            tempObj.id = 3;
             break;
           }
           case 'day': {
             this.dBtn = true;
+            tempObj.id = 4;
             break;
           }
+          default: {
+            console.error(`Please watch the spelling of your View: ${btn}`);
+          }
+        }
+        if (tempObj.id >= 1 && tempObj.id <= 4) {
+          tempArray.push(tempObj);
         }
       }
+      tempArray.sort((a, b) => a.id - b.id);
+      this.views = [];
+      for (const tempOb of tempArray) {
+        this.views.push(tempOb.view);
+      }
     }
+  }
+
+  private setAllButtonsTrue(): void {
+    this.yBtn = true;
+    this.mBtn = true;
+    this.wBtn = true;
+    this.dBtn = true;
   }
 
   private setLocaleForCalendar(): void {
@@ -634,6 +615,41 @@ export class CalendarComponent implements OnInit, DoCheck {
     this.localeValue = {weekdays: weekday, months: monthnames, others: CalendarComponent.setOthers(this.language)};
   }
 
+  private getDaysOfMonth(f?: number): number {
+    let firstDay: Date;
+    if (f == null) {
+      firstDay = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0);
+    } else {
+      firstDay = new Date(this.date.getFullYear(), f + 1, 0);
+    }
+    return firstDay.getDate();
+  }
+
+  private getEmptyStartDays(month?: number): number {
+    let firstDay;
+    if (month == null) {
+      firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1);
+    } else {
+      firstDay = new Date(this.date.getFullYear(), month, 1);
+    }
+    switch (firstDay.getDay()) {
+      case 0:
+        return 6;
+      case 1:
+        return 0;
+      case 2:
+        return 1;
+      case 3:
+        return 2;
+      case 4:
+        return 3;
+      case 5:
+        return 4;
+      case 6:
+        return 5;
+    }
+  }
+
   private setTheme(): void {
     if (this.theme === 'light' || this.theme === 'Light') {
       this.theme = 'light';
@@ -643,6 +659,21 @@ export class CalendarComponent implements OnInit, DoCheck {
       this.theme = 'dark';
     }
   }
+
+  private setTitleUsage(): void {
+    this.useTitle = this.useTitle || typeof this.useTitle === 'string';
+  }
+
+  goToParentView(): void {
+    if (this.views.length > 1) {
+      for (let i = 0; i < this.views.length; i++) {
+        if (this.views[i] === this.initialView && i !== 0) {
+          this.initialView = this.views[i - 1];
+        }
+      }
+    }
+  }
+
 }
 
 export interface Item {

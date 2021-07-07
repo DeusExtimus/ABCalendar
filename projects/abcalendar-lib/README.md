@@ -11,6 +11,7 @@ Configurable values:
 - View selection (year/month/week/day)
 - Language or Object with LocalValue
 - Theme
+- UseTitle
   
 - Event output (on Click (on Event))
 - Event change (on Drop Event (Drag'n'Drop))
@@ -147,7 +148,18 @@ Configurable values:
         return {lang: 'en-US'};
         ```
         -> string must be in locale-Format (example: en-US, de-De)
-        
+
+  * **config for [events]:**
+    * in .html:
+      ```
+      [useTitle] = "true"
+      
+      or
+      
+      useTitle
+      ```
+    * default is 'false'
+
     * **usage of (eventEmitter):**
         * in .html:
         ```
@@ -242,6 +254,10 @@ Configurable values:
 [event]:
 * Item[]: (id, title, color, list, dateOfExpiry)
 * Optional: list, color
+
+[useTitle]:
+* Boolean
+* Can be used as 'useTitle'
 
 ## Output Types
 

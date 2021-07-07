@@ -11,6 +11,7 @@ Configurable values:
 - View selection (year/month/week/day)
 - Language or Object with LocalValue
 - Theme
+- UseTitle
 
 - Event output (on Click (on Event))
 - Event change (on Drop Event (Drag'n'Drop))
@@ -148,72 +149,83 @@ Configurable values:
       ```
     -> string must be in locale-Format (example: en-US, de-De)
 
-  * **usage of (eventEmitter):**
+  * **config for [events]:**
     * in .html:
       ```
-      (eventEmitter) = "setItem($event)"
+      [useTitle] = "true"
+      
+      or
+      
+      useTitle
       ```
-    * in .ts:
-      ```
-      setItem($event): void {
-          console.log($event.title);
-          console.log($event.itemId);
-          this.router.navigateByUrl(`randomPageUrl/${$event.itemId}`);
-      }
-      ```
+    * default is 'false'
 
-    * **usage of (eventChanged)**
+    * **usage of (eventEmitter):**
       * in .html:
         ```
-        (eventChanged) = "changeItemDate($event)"
+        (eventEmitter) = "setItem($event)"
         ```
-      *in .ts:
+      * in .ts:
         ```
-          changeItem($event: Item): void {
-            console.log($event);
-            for (const event of this.events) {
-              if (event.itemId === $event.itemId) {
-                event.startDate = $event.startDate;
+        setItem($event): void {
+            console.log($event.title);
+            console.log($event.itemId);
+            this.router.navigateByUrl(`randomPageUrl/${$event.itemId}`);
+        }
+        ```
+
+      * **usage of (eventChanged)**
+        * in .html:
+          ```
+          (eventChanged) = "changeItemDate($event)"
+          ```
+        *in .ts:
+          ```
+            changeItem($event: Item): void {
+              console.log($event);
+              for (const event of this.events) {
+                if (event.itemId === $event.itemId) {
+                  event.startDate = $event.startDate;
+                }
               }
             }
-          }
+          ```
+
+    * **usage of (dayEmitter):**
+      * in .html:
+        ```
+        (dayEmitter) = "getDate($event)"
+        ```
+      * in .ts:
+        ```
+        getDate($event): void {
+            console.log($event.getFullYear());
+        }
         ```
 
-  * **usage of (dayEmitter):**
-    * in .html:
+    * **usage of (dateChange):**
+      * in .html:
       ```
-      (dayEmitter) = "getDate($event)"
+      (dateChange) = "setNewDate($event)"
       ```
-    * in .ts:
+      * in .ts:
       ```
-      getDate($event): void {
-          console.log($event.getFullYear());
+      setNewDate($event): void {
+          this.date = $event;
       }
       ```
 
-  * **usage of (dateChange):**
-    * in .html:
-    ```
-    (dateChange) = "setNewDate($event)"
-    ```
-    * in .ts:
-    ```
-    setNewDate($event): void {
-        this.date = $event;
-    }
-    ```
-
-  * **usage of (viewChange):**
-    * in .html:
-      ```
-      (viewChange) = "writeNewViewToVariable($event)"
-      ```
-    * in .ts:
-      ```
-      writeNewViewToVariable($event): void {
-          this.view = $event;
-      }
-      ```
+    * **usage of (viewChange):**
+      * in .html:
+        ```
+        (viewChange) = "writeNewViewToVariable($event)"
+        ```
+      * in .ts:
+        ```
+        writeNewViewToVariable($event): void {
+            this.view = $event;
+        }
+        ```
 
 ## Input types
 [views]:
@@ -242,6 +254,10 @@ Configurable values:
 [event]:
 * Item[]: (id, title, color, list, dateOfExpiry)
 * Optional: list, color
+
+[useTitle]:
+* Boolean
+* Can be used as 'useTitle'
 
 ## Output Types
 

@@ -12,6 +12,7 @@ import {Item, Local} from './calendar/calendar.component';
       [localeValue]="abConfig.localeValue"
       [language]="abConfig.language"
       [theme]="abConfig.theme"
+      [useTitle]="abConfig.useTitle"
       (eventClick)="setEvent($event)"
       (eventChange)="changeEvent($event)"
       (dayClick)="setDay($event)"
@@ -25,21 +26,6 @@ export class AbcalendarLibComponent {
 
   @Input()
   abConfig: AbConfig;
-
-  // @Input()
-  // initialView: string;
-  // @Input()
-  // initialDate: Date;
-  // @Input()
-  // events: Item[];
-  // @Input()
-  // views: string[];
-  // @Input()
-  // localeValue: Local;
-  // @Input()
-  // language: string;
-  // @Input()
-  // theme: string;
   @Output()
   eventEmitter = new EventEmitter<Item>();
   @Output()
@@ -80,4 +66,5 @@ export interface AbConfig {
   localeValue?: Local;
   language?: string;
   theme?: string;
+  useTitle?: boolean;
 }
