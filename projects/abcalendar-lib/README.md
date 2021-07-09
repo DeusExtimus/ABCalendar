@@ -1,7 +1,7 @@
 # ABCalendar
 
 ## Note & Description
-**SUPPORTS BOOTSTRAP 5**
+**OPTIMIZED FOR BOOTSTRAP 5**
 
 The ABCalender was programmed, because there is still no usable calendar with year view, which is easy to use and therefore ideal for beginners.
 Configurable values:
