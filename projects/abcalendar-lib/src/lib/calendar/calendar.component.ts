@@ -454,32 +454,16 @@ export class CalendarComponent implements OnInit, DoCheck {
   }
 
   setNewDate(currentDay: Date, e: any): void {
-    if (e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
-      if (this.dragged.singleDay || this.dragged.startDate === this.dragged.endDate) {
-        this.changeSingleDayEvent(currentDay);
-      } else {
-        this.changeMultiDayEvent(currentDay);
-      }
-    }
-  }
-
-  private changeSingleDayEvent(currentDay: Date): void {
-    if (currentDay !== this.dragged.startDate) {
+    if (e.screenX === 0 && e.screenY === 0 && e.clientX === 0 && currentDay !== this.dragged.startDate) {
+      this.dragged.endDate = new Date(currentDay.getTime() + this.dragged.eventLenght);
       this.dragged.startDate = currentDay;
-      for (const item of this.events) {
-        if (item.itemId === this.dragged.itemId) {
-          item.startDate = this.dragged.startDate;
-          this.eventChange.emit(item);
-        }
-      }
+      this.changeDayEvent();
     }
   }
 
-  private changeMultiDayEvent(currentDay: Date): void {
+  private changeDayEvent(): void {
     for (let item of this.events) {
       if (item.itemId === this.dragged.itemId) {
-        this.dragged.startDate = currentDay;
-        this.dragged.endDate = new Date(currentDay.getTime() + this.dragged.eventLenght);
         item = this.dragged;
         this.eventChange.emit(item);
       }
@@ -693,6 +677,10 @@ export class CalendarComponent implements OnInit, DoCheck {
 
   private setTitleUsage(): void {
     this.useTitle = this.useTitle || typeof this.useTitle === 'string';
+  }
+
+  isFirstDayInMonth(currentDay: Date): boolean {
+    return currentDay.getTime() === this.daysOfPrevMonth()[0].getTime();
   }
 
 }

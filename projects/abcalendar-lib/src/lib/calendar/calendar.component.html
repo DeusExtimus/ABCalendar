@@ -89,7 +89,7 @@
                 <div *ngFor="let item of rightMultiDayEvents(beforeDay.getDate(), monthNum - 1)" class="ps-0 mt-05">
                   <!--                  STARTDAY-->
                   <div
-                    *ngIf="isStartDate(item, beforeDay.getDate(), monthNum + 1), else isEnd">
+                    *ngIf="isStartDate(item, beforeDay.getDate(), monthNum), else isEnd">
                     <div class="year-multi-day pointer rounded-start"
                          draggable="true"
                          (drag)="dragged = item"
@@ -327,7 +327,12 @@
                  'color': getTextColor(getItemColor(item))
                  }"
               >
-                &nbsp;
+                <div *ngIf="!isFirstDayInMonth(beforeday)">
+                  &nbsp;
+                </div>
+                <div *ngIf="isFirstDayInMonth(beforeday)" class="ms-3">
+                  {{item.title}}
+                </div>
               </div>
             </ng-template>
             <!--EVENT MIDDLE-->
@@ -345,14 +350,19 @@
                  'width': '999%'
                  }"
               >
-                &nbsp;
+                <div *ngIf="!isFirstDayInMonth(beforeday)">
+                  &nbsp;
+                </div>
+                <div *ngIf="isFirstDayInMonth(beforeday)" class="ms-3">
+                  {{item.title}}
+                </div>
               </div>
             </ng-template>
           </div>
         </div>
         <!--        DAYS OF CURRENT MONTH-->
         <div *ngFor="let currentDay of monthDays()"
-             class="border text-start w-14 vh-15 lgOnHover overflow-hidden "
+             class="border text-start w-14 vh-15 lgOnHover overflow-hidden"
              id="{{currentDay}}"
              [ngStyle]="{'background-color': colorOfTheDay(currentDay.getDate())}"
              [ngClass]="{'gOnHover lg border-dg': theme == 'night'}"
