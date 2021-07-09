@@ -443,6 +443,16 @@ export class CalendarComponent implements OnInit, DoCheck {
     return tempArray;
   }
 
+  goToParentView(): void {
+    if (this.views.length > 1) {
+      for (let i = 0; i < this.views.length; i++) {
+        if (this.views[i] === this.initialView && i !== 0) {
+          this.initialView = this.views[i - 1];
+        }
+      }
+    }
+  }
+
   setNewDate(currentDay: Date, e: any): void {
     if (e.screenX === 0 && e.screenY === 0 && e.clientX === 0) {
       if (this.dragged.singleDay || this.dragged.startDate === this.dragged.endDate) {
@@ -466,7 +476,14 @@ export class CalendarComponent implements OnInit, DoCheck {
   }
 
   private changeMultiDayEvent(currentDay: Date): void {
-    console.warn('Working at this point at the moment');
+    for (let item of this.events) {
+      if (item.itemId === this.dragged.itemId) {
+        this.dragged.startDate = currentDay;
+        this.dragged.endDate = new Date(currentDay.getTime() + this.dragged.eventLenght);
+        item = this.dragged;
+        this.eventChange.emit(item);
+      }
+    }
   }
 
   private correctDate(item: Item, day: number, month?: number): boolean {
@@ -676,16 +693,6 @@ export class CalendarComponent implements OnInit, DoCheck {
 
   private setTitleUsage(): void {
     this.useTitle = this.useTitle || typeof this.useTitle === 'string';
-  }
-
-  goToParentView(): void {
-    if (this.views.length > 1) {
-      for (let i = 0; i < this.views.length; i++) {
-        if (this.views[i] === this.initialView && i !== 0) {
-          this.initialView = this.views[i - 1];
-        }
-      }
-    }
   }
 
 }

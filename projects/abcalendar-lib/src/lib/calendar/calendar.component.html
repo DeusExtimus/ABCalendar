@@ -4,7 +4,7 @@
     <div class="btn-toolbar mb-2" role="toolbar">
       <!--        PREV-TODAY-NEXT-BUTTONS-->
       <div class="col-4 mt-3">
-        <div class="btn-group" role="group" #dateChangeButtons>
+        <div class="btn-group" role="group">
           <button type="button"
                   [ngClass]="{'btn btn-dark border border-grey rounded-start': theme == 'night',
                                 'btn btn-outline-dark': theme == 'light' || theme == 'dark'}"
@@ -316,8 +316,6 @@
             <!--            EVENT ENDING-->
             <ng-template #isEnd>
               <div class="crop rounded m-1 pointer ml-n10"
-                   draggable="true"
-                   (drag)="dragged = item"
                    *ngIf="isEndDate(item, beforeday.getDate(), beforeday.getMonth()); else isNot"
                    (click)="eventClick.emit(item)"
                    [ngClass]="{
@@ -335,8 +333,6 @@
             <!--EVENT MIDDLE-->
             <ng-template #isNot>
               <div class="crop rounded m-1 pointer mx-n10"
-                   draggable="true"
-                   (drag)="dragged = item"
                    *ngIf="!startDayIsEndDay(item);"
                    (click)="eventClick.emit(item)"
                    [ngClass]="{
@@ -667,6 +663,7 @@
         </div>
       </div>
     </div>
+
   </div>
   <div class="container h-50px"></div>
 </div>
